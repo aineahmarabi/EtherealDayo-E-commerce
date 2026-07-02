@@ -133,7 +133,7 @@ function BrandsRow() {
 }
 
 function NewArrivalsRow() {
-  const newArrivals = useQuery(api.products.listNewArrivals);
+  const newArrivals = useQuery(api.products.listNewArrivals, {});
 
   return (
     <section className="py-24 px-4 sm:px-6 lg:px-8 border-t border-gold/5">
