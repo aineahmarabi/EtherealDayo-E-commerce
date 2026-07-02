@@ -36,7 +36,7 @@ export function Footer() {
       {/* Top hairline */}
       <div className="hairline" />
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-20">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 pt-20 pb-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-16">
 
           {/* Brand column */}
