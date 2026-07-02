@@ -1,26 +1,120 @@
 @import "tailwindcss";
 
+@theme {
+  /* Purple ramp */
+  --color-oxblood: #1A0B2E;
+  --color-bordeaux-deep: #2D1457;
+  --color-bordeaux: #431E82;
+  --color-burgundy: #5928A6;
+  --color-burgundy-light: #7036CC;
+  --color-dusty-rose: #8B52E8;
+
+  /* Metals & neutrals */
+  --color-noir: #0A0414;
+  --color-ink: #140A28;
+  --color-gold: #C9A961;
+  --color-gold-soft: #E5D5B8;
+  --color-bone: #F4EFE7;
+  --color-ivory: #FBF9F5;
+  --color-muted-text: #A89B8C;
+
+  /* World accents */
+  --color-accent-her: #C97B89;
+  --color-accent-him: #8B1A35;
+  --color-accent-best: #C9A961;
+  --color-accent-new: #A86C9E;
+
+  /* Typography */
+  --font-display: var(--font-jost), 'Jost', sans-serif;
+  --font-body: var(--font-jost), 'Jost', sans-serif;
+
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+}
+
+/* CSS custom properties (always accessible) */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --oxblood: #1A0B2E;
+  --bordeaux-deep: #2D1457;
+  --bordeaux: #431E82;
+  --burgundy: #5928A6;
+  --burgundy-light: #7036CC;
+  --dusty-rose: #8B52E8;
+  --noir: #0A0414;
+  --ink: #140A28;
+  --gold: #C9A961;
+  --gold-soft: #E5D5B8;
+  --bone: #F4EFE7;
+  --ivory: #FBF9F5;
+  --text-muted: #A89B8C;
+  --accent-her: #C97B89;
+  --accent-him: #8B1A35;
+  --accent-best: #C9A961;
+  --accent-new: #A86C9E;
+  --ease-luxury: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Base */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--ink);
+  color: var(--bone);
+  font-family: var(--font-inter, Inter, system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100dvh;
+}
+
+/* Focus */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--noir);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bordeaux);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--burgundy);
+}
+
+/* Selection */
+::selection {
+  background: var(--burgundy);
+  color: var(--bone);
+}
+
+/* Gold hairline utility */
+.hairline {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.6;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
