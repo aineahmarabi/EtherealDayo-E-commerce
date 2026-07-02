@@ -407,8 +407,8 @@ export default function ProductEditPage({ params }: { params: Promise<{ id: stri
             <div className="grid grid-cols-3 gap-4">
               {(["sillage", "longevity", "intensity"] as const).map(key => (
                 <FieldRow key={key} label={key.charAt(0).toUpperCase() + key.slice(1)}>
-                  <input type="number" min="1" max="5" name={key} value={(form as Record<string, string>)[key]} onChange={handleChange} className={inputCls} />
-                  <RatingBar value={Number((form as Record<string, string>)[key])} />
+                  <input type="number" min="1" max="5" name={key} value={(form as Record<string, any>)[key]} onChange={handleChange} className={inputCls} />
+                  <RatingBar value={Number((form as Record<string, any>)[key])} />
                 </FieldRow>
               ))}
             </div>
