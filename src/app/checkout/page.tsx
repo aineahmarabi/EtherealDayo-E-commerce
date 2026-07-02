@@ -103,7 +103,7 @@ export default function CheckoutPage() {
   const orderTotal = Math.max(0, subtotal + shippingCost - discount);
 
   function handleApplyCoupon() {
-    if (!validateCoupon || validateCoupon === "skip") return;
+    if (validateCoupon === undefined) return;
     if (!validateCoupon.valid) {
       setCouponError(validateCoupon.message ?? "Invalid code");
       return;
