@@ -226,7 +226,7 @@ export default function AdminDashboard() {
                     <tr key={order._id} className="hover:bg-bordeaux-deep/10 transition-colors">
                       <td className="px-4 py-3 text-gold">{order.number}</td>
                       <td className="px-4 py-3 text-bone/70 truncate max-w-[120px]">{order.customerName}</td>
-                      <td className="px-4 py-3 text-right text-bone">{formatPrice(order.total)}</td>
+                      <td className="px-4 py-3 text-right text-bone">{formatKES(order.total)}</td>
                       <td className="px-4 py-3 text-right">
                         <span className={`px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider ${
                           order.status === "new" ? "bg-gold/10 text-gold" :
