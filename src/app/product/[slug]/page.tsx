@@ -79,8 +79,8 @@ function ScentPyramid({
 function BottleDisplay({ image, name }: { image?: string; name: string }) {
   if (image) {
     return (
-      <div className="relative w-full aspect-[3/4] max-w-[300px] mx-auto rounded-2xl overflow-hidden bg-noir border border-gold/10">
-        <Image src={image} alt={name} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 300px" />
+      <div className="relative w-full aspect-[3/4] max-w-[300px] mx-auto rounded-2xl overflow-hidden bg-gradient-to-b from-white/[0.04] to-white/[0.01] flex items-center justify-center p-6 border border-gold/10">
+        <Image src={image} alt={name} fill className="object-contain p-6" sizes="(max-width: 1024px) 100vw, 300px" />
       </div>
     );
   }
