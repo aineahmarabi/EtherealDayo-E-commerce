@@ -3,8 +3,10 @@
 import { useQuery } from "convex/react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { api } from "../../../convex/_generated/api";
 import { BrandCardSkeleton } from "@/components/ui/Skeleton";
+import { getBrandImage } from "@/lib/brandImages";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -76,11 +78,20 @@ export default function BrandsPage() {
                     href={`/brand/${brand.slug}`}
                     className="group flex flex-col gap-5 p-8 rounded-2xl border border-gold/10 bg-bordeaux-deep/10 hover:border-gold/30 hover:bg-bordeaux-deep/20 transition-all duration-500"
                   >
-                    {/* Monogram */}
+                    {/* Logo / Monogram */}
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 rounded-full border border-gold/30 group-hover:border-gold/60 transition-colors flex items-center justify-center flex-shrink-0">
-                        <span className="font-display text-2xl text-gold">{brand.name.charAt(0)}</span>
-                      </div>
+                      {(() => {
+                        const img = getBrandImage(brand.slug);
+                        return img ? (
+                          <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center flex-shrink-0 border border-gold/20 group-hover:border-gold/50 transition-colors overflow-hidden">
+                            <Image src={img} alt={brand.name} width={44} height={44} className="object-contain w-11 h-11" />
+                          </div>
+                        ) : (
+                          <div className="w-14 h-14 rounded-full border border-gold/30 group-hover:border-gold/60 transition-colors flex items-center justify-center flex-shrink-0">
+                            <span className="font-display text-2xl text-gold">{brand.name.charAt(0)}</span>
+                          </div>
+                        );
+                      })()}
                       <h2 className="font-display text-xl text-bone group-hover:text-gold transition-colors duration-300">
                         {brand.name}
                       </h2>
