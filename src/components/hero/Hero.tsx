@@ -374,7 +374,7 @@ function DesktopColumnImage({ src, name, accent }: { src: string; name: string; 
         src={src}
         alt={name}
         fill
-        className="object-cover object-top transition-transform duration-700 ease-in-out group-hover:scale-110"
+        className="object-contain transition-transform duration-700 ease-in-out group-hover:scale-105"
         sizes="(max-width: 768px) 20vw, 20vw"
         onError={() => setError(true)}
       />
@@ -382,7 +382,7 @@ function DesktopColumnImage({ src, name, accent }: { src: string; name: string; 
       <div
         className="absolute inset-0"
         style={{
-          background: `linear-gradient(180deg, rgba(10,4,20,0.15) 0%, rgba(10,4,20,0.05) 40%, rgba(10,4,20,0.75) 75%, rgba(10,4,20,0.96) 100%)`,
+          background: `linear-gradient(180deg, rgba(10,4,20,0.05) 0%, rgba(10,4,20,0.0) 40%, rgba(10,4,20,0.65) 78%, rgba(10,4,20,0.95) 100%)`,
         }}
       />
       {/* subtle accent tint */}
