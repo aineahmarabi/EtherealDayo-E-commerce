@@ -1,12 +1,28 @@
-import { query, mutation } from "./_generated/server";
+import { query, mutation, QueryCtx } from "./_generated/server";
 import { v } from "convex/values";
+import { Id } from "./_generated/dataModel";
+
+async function withImageUrls(ctx: QueryCtx, product: any) {
+  const images = await Promise.all(product.images.map(async (img: string) => {
+    if (img.includes("/api/storage/")) {
+      const id = img.split("/api/storage/")[1].split("?")[0];
+      return (await ctx.storage.getUrl(id as Id<"_storage">)) ?? img;
+    }
+    if (!img.includes("/") && img.trim() !== "") {
+      return (await ctx.storage.getUrl(img as Id<"_storage">)) ?? img;
+    }
+    return img;
+  }));
+  return { ...product, images };
+}
 
 export const listActive = query({
   handler: async (ctx) => {
-    return await ctx.db
+    const products = await ctx.db
       .query("products")
       .withIndex("by_status", (q) => q.eq("status", "active"))
       .collect();
+    return await Promise.all(products.map(p => withImageUrls(ctx, p)));
   },
 });
 
@@ -23,17 +39,19 @@ export const listByAudience = query({
       .withIndex("by_audience", (q) => q.eq("audience", "unisex"))
       .filter((q) => q.eq(q.field("status"), "active"))
       .collect();
-    return [...her, ...unisex];
+    const all = [...her, ...unisex];
+    return await Promise.all(all.map(p => withImageUrls(ctx, p)));
   },
 });
 
 export const listBestsellers = query({
   handler: async (ctx) => {
-    return await ctx.db
+    const products = await ctx.db
       .query("products")
       .withIndex("by_bestseller", (q) => q.eq("isBestseller", true))
       .filter((q) => q.eq(q.field("status"), "active"))
       .collect();
+    return await Promise.all(products.map(p => withImageUrls(ctx, p)));
   },
 });
 
@@ -45,7 +63,8 @@ export const listNewArrivals = query({
       .query("products")
       .withIndex("by_status", (q) => q.eq("status", "active"))
       .collect();
-    return all.filter((p) => p.publishedAt >= cutoff);
+    const newArrivals = all.filter((p) => p.publishedAt >= cutoff);
+    return await Promise.all(newArrivals.map(p => withImageUrls(ctx, p)));
   },
 });
 
@@ -61,18 +80,20 @@ export const getBySlug = query({
       .query("variants")
       .withIndex("by_product", (q) => q.eq("productId", product._id))
       .collect();
-    return { ...product, variants };
+    const pWithImages = await withImageUrls(ctx, product);
+    return { ...pWithImages, variants };
   },
 });
 
 export const listByBrand = query({
   args: { brandId: v.id("brands") },
   handler: async (ctx, { brandId }) => {
-    return await ctx.db
+    const products = await ctx.db
       .query("products")
       .withIndex("by_brand", (q) => q.eq("brandId", brandId))
       .filter((q) => q.eq(q.field("status"), "active"))
       .collect();
+    return await Promise.all(products.map(p => withImageUrls(ctx, p)));
   },
 });
 
@@ -85,7 +106,7 @@ export const search = query({
       .query("products")
       .withIndex("by_status", (s) => s.eq("status", "active"))
       .collect();
-    return all.filter(
+    const results = all.filter(
       (p) =>
         p.name.toLowerCase().includes(lower) ||
         p.brandName.toLowerCase().includes(lower) ||
@@ -94,18 +115,23 @@ export const search = query({
           n.toLowerCase().includes(lower)
         )
     );
+    return await Promise.all(results.map(p => withImageUrls(ctx, p)));
   },
 });
 
 export const listAll = query({
-  handler: async (ctx) =>
-    await ctx.db.query("products").collect(),
+  handler: async (ctx) => {
+    const products = await ctx.db.query("products").collect();
+    return await Promise.all(products.map(p => withImageUrls(ctx, p)));
+  }
 });
 
 export const getById = query({
   args: { id: v.id("products") },
   handler: async (ctx, { id }) => {
-    return await ctx.db.get(id);
+    const product = await ctx.db.get(id);
+    if (!product) return null;
+    return await withImageUrls(ctx, product);
   },
 });
 

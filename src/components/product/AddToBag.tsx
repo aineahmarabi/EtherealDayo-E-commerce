@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Check } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 
 type Variant = {
   _id?: string;
@@ -83,7 +83,7 @@ export function AddToBag({ productId, productName, brandName, variants, image = 
       {/* Price */}
       {selectedVariant && (
         <p className="font-display text-2xl text-bone">
-          ${selectedVariant.price.toLocaleString()}
+          {formatPrice(selectedVariant.price)}
         </p>
       )}
 

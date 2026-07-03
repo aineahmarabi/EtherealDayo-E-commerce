@@ -203,12 +203,11 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             >
               {/* Brand + name */}
               <div className="flex flex-col gap-2">
-                <Link
-                  href={`/brand/${(product as { brandSlug?: string }).brandSlug ?? "#"}`}
-                  className="text-xs tracking-[0.3em] uppercase text-gold hover:text-gold-soft font-body transition-colors"
+                <span
+                  className="text-xs tracking-[0.3em] uppercase text-gold font-body"
                 >
                   {product.brandName}
-                </Link>
+                </span>
                 <h1 className="font-display text-3xl md:text-5xl text-bone tracking-tight leading-tight">
                   {product.name}
                 </h1>
