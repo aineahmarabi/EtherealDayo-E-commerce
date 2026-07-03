@@ -9,13 +9,14 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { Search, Plus, X, User, MapPin, Package, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-type Status = "all" | "new" | "fulfilled" | "refunded" | "cancelled";
+type Status = "all" | "new" | "dispatched" | "fulfilled" | "refunded" | "cancelled";
 
-const STATUS_OPTIONS: Status[] = ["all", "new", "fulfilled", "refunded", "cancelled"];
+const STATUS_OPTIONS: Status[] = ["all", "new", "dispatched", "fulfilled", "refunded", "cancelled"];
 
 function statusColor(status: string) {
   switch (status) {
     case "new": return "bg-gold/10 text-gold";
+    case "dispatched": return "bg-blue-600/30 text-blue-300";
     case "fulfilled": return "bg-green-900/30 text-green-400";
     case "refunded": return "bg-blue-900/30 text-blue-400";
     case "cancelled": return "bg-bordeaux/20 text-dusty-rose";
@@ -215,9 +216,9 @@ export default function OrdersPage() {
               <div className="p-6 flex flex-col gap-4">
                 <p className="text-[10px] uppercase tracking-widest text-muted-text font-body">Update Status</p>
                 <div className="flex flex-col gap-2">
-                  {(["new", "fulfilled", "refunded", "cancelled"] as const).map((s) => {
+                  {(["new", "dispatched", "fulfilled", "refunded", "cancelled"] as const).map((s) => {
                     const isActive = selectedOrder.status === s;
-                    const dotColor = s === "new" ? "bg-gold" : s === "fulfilled" ? "bg-green-400" : s === "refunded" ? "bg-blue-400" : "bg-red-400";
+                    const dotColor = s === "new" ? "bg-gold" : s === "dispatched" ? "bg-blue-300" : s === "fulfilled" ? "bg-green-400" : s === "refunded" ? "bg-blue-400" : "bg-red-400";
                     const btnCls = isActive
                       ? "border-purple-500 bg-purple-900/40 text-purple-200"
                       : "border-gold/15 text-muted-text hover:border-gold/30 hover:text-bone";

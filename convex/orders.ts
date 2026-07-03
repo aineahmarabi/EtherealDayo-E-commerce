@@ -65,8 +65,16 @@ export const create = mutation({
     stripePaymentIntentId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    // Generate sequential order ID
+    const allOrders = await ctx.db.query("orders").collect();
+    const sequence = allOrders.length + 1;
+    const finalNumber = `ED-${sequence.toString().padStart(5, "0")}`;
+
+    const { number, ...restArgs } = args;
+
     const orderId = await ctx.db.insert("orders", {
-      ...args,
+      ...restArgs,
+      number: finalNumber,
       status: "new",
       emailSent: false,
     });
