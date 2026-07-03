@@ -8,6 +8,8 @@ async function withImageUrls(ctx: QueryCtx, product: any) {
     if (img.includes("/api/storage/")) {
       const id = img.split("/api/storage/")[1].split("?")[0];
       try {
+        const file = await ctx.db.get(id as Id<"_storage">);
+        if (!file) return null;
         return await ctx.storage.getUrl(id as Id<"_storage">);
       } catch {
         return null;
@@ -15,6 +17,8 @@ async function withImageUrls(ctx: QueryCtx, product: any) {
     }
     if (!img.includes("/") && img.trim() !== "") {
       try {
+        const file = await ctx.db.get(img as Id<"_storage">);
+        if (!file) return null;
         return await ctx.storage.getUrl(img as Id<"_storage">);
       } catch {}
       return null;
