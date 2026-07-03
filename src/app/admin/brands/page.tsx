@@ -3,9 +3,11 @@
 import { useState, useRef } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { api } from "../../../../convex/_generated/api";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Plus, ExternalLink, UploadCloud, X } from "lucide-react";
+import { getBrandImage } from "@/lib/brandImages";
 
 export default function BrandsPage() {
   const brands = useQuery(api.brands.list);
@@ -154,16 +156,18 @@ export default function BrandsPage() {
               className="p-5 rounded-2xl border border-gold/10 bg-white/[0.02] hover:border-gold/25 transition-all flex flex-col gap-3 shadow-sm group"
             >
               <div className="flex items-start justify-between gap-3">
-                {brand.logo ? (
-                  <div className="w-12 h-12 rounded-xl border border-gold/20 flex items-center justify-center overflow-hidden bg-white/5 p-1.5">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={brand.logo} alt={brand.name} className="w-full h-full object-contain" />
+                {(() => {
+                const logoSrc = brand.logo || getBrandImage(brand.slug);
+                return logoSrc ? (
+                  <div className="w-12 h-12 rounded-xl border border-gold/20 flex items-center justify-center overflow-hidden bg-white p-1">
+                    <Image src={logoSrc} alt={brand.name} width={40} height={40} className="object-contain w-10 h-10" />
                   </div>
                 ) : (
                   <div className="w-12 h-12 rounded-xl bg-bordeaux-deep/40 border border-gold/20 flex items-center justify-center font-display text-gold text-lg">
                     {brand.name.charAt(0)}
                   </div>
-                )}
+                );
+              })()}
                 <a href={`/brand/${brand.slug}`} target="_blank" rel="noopener noreferrer"
                   className="p-2 -mr-2 text-muted-text hover:text-gold transition-colors cursor-pointer opacity-0 group-hover:opacity-100">
                   <ExternalLink size={14} />
