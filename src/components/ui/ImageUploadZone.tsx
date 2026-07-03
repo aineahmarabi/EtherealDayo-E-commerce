@@ -68,6 +68,8 @@ export function ImageUploadZone({ images, onChange }: Props) {
   const removeImage = (idx: number) =>
     onChange(images.filter((_, i) => i !== idx));
 
+  const [brokenImages, setBrokenImages] = useState<Record<number, boolean>>({});
+
   return (
     <div className="flex flex-col gap-4">
       {/* Previews */}
@@ -76,10 +78,22 @@ export function ImageUploadZone({ images, onChange }: Props) {
           {images.map((url, i) => (
             <div
               key={i}
-              className="relative group w-24 h-24 rounded-xl border border-gold/20 overflow-hidden bg-noir/50 flex-shrink-0"
+              className="relative group w-24 h-24 rounded-xl border border-gold/20 overflow-hidden bg-noir/50 flex-shrink-0 flex items-center justify-center"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={url} alt="" className="w-full h-full object-cover" />
+              {brokenImages[i] ? (
+                <div className="w-full h-full flex flex-col items-center justify-center p-2 bg-noir/80 text-muted-text text-[10px] text-center font-body gap-1">
+                  <span className="text-[14px]">⚠️</span>
+                  <span>Missing File</span>
+                </div>
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={url}
+                  alt=""
+                  className="w-full h-full object-cover"
+                  onError={() => setBrokenImages((prev) => ({ ...prev, [i]: true }))}
+                />
+              )}
               {/* Cover badge on first */}
               {i === 0 && (
                 <span className="absolute top-1 left-1 bg-gold text-noir text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded leading-none">
