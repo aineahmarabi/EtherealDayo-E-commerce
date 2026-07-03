@@ -4,10 +4,35 @@ import { useRef, useState, useCallback } from "react";
 import { UploadCloud, X } from "lucide-react";
 import { useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
+import { motion, AnimatePresence } from "framer-motion";
+import { getBrandImage } from "@/lib/brandImages";
 
 type Props = {
   images: string[];
   onChange: (urls: string[]) => void;
+};
+
+const parentVariants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+};
+
+const childVariants = {
+  hidden: { opacity: 0, scale: 0.85, y: 10 },
+  show: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 260,
+      damping: 20,
+    },
+  },
 };
 
 export function ImageUploadZone({ images, onChange }: Props) {
@@ -72,62 +97,71 @@ export function ImageUploadZone({ images, onChange }: Props) {
     <div className="flex flex-col gap-4">
       {/* Previews */}
       {images.length > 0 && (
-        <div className="flex gap-3 flex-wrap">
-          {images.map((url, i) => (
-            <div
-              key={i}
-              className="relative group w-24 h-24 rounded-xl border border-gold/20 overflow-hidden bg-noir/50 flex-shrink-0 flex items-center justify-center"
-            >
-              {(() => {
-                const isWhitelisted = url.startsWith("http") && url.includes("/api/storage/");
-
-                return !isWhitelisted ? (
-                  <div className="w-full h-full flex flex-col items-center justify-center p-2 bg-noir/80 text-muted-text text-[10px] text-center font-body gap-1">
-                    <span className="text-[14px]">⚠️</span>
-                    <span>Invalid Image</span>
-                  </div>
-                ) : (
-                  <>
-                    {/* Fallback placeholder (hidden by default, shown via onError) */}
-                    <div 
-                      className="fallback-placeholder w-full h-full flex flex-col items-center justify-center p-2 bg-noir/80 text-muted-text text-[10px] text-center font-body gap-1"
-                      style={{ display: "none" }}
-                    >
-                      <span className="text-[14px]">⚠️</span>
-                      <span>Missing File</span>
-                    </div>
-
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={url}
-                      alt=""
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.style.display = "none";
-                        const fallback = e.currentTarget.parentElement?.querySelector(".fallback-placeholder") as HTMLElement | null;
-                        if (fallback) fallback.style.display = "flex";
-                      }}
-                    />
-                  </>
-                );
-              })()}
-
-              {/* Cover badge on first */}
-              {i === 0 && (
-                <span className="absolute top-1 left-1 bg-gold text-noir text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded leading-none">
-                  Cover
-                </span>
-              )}
-              <button
-                type="button"
-                onClick={() => removeImage(i)}
-                className="absolute top-1 right-1 p-1 bg-black/70 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+        <motion.div 
+          variants={parentVariants}
+          initial="hidden"
+          animate="show"
+          className="flex gap-3 flex-wrap"
+        >
+          <AnimatePresence initial={false}>
+            {images.map((url, i) => (
+              <motion.div
+                key={url}
+                variants={childVariants}
+                exit={{ opacity: 0, scale: 0.8, y: -10, transition: { duration: 0.2 } }}
+                className="relative group w-24 h-24 rounded-xl border border-gold/20 overflow-hidden bg-noir/50 flex-shrink-0 flex items-center justify-center"
               >
-                <X size={12} />
-              </button>
-            </div>
-          ))}
-        </div>
+                {(() => {
+                  const isWhitelisted = url.startsWith("http") && url.includes("/api/storage/");
+
+                  return !isWhitelisted ? (
+                    <div className="w-full h-full flex flex-col items-center justify-center p-2 bg-noir/80 text-muted-text text-[10px] text-center font-body gap-1">
+                      <span className="text-[14px]">⚠️</span>
+                      <span>Invalid Image</span>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Fallback placeholder (hidden by default, shown via onError) */}
+                      <div 
+                        className="fallback-placeholder w-full h-full flex flex-col items-center justify-center p-2 bg-noir/80 text-muted-text text-[10px] text-center font-body gap-1"
+                        style={{ display: "none" }}
+                      >
+                        <span className="text-[14px]">⚠️</span>
+                        <span>Missing File</span>
+                      </div>
+
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={url}
+                        alt=""
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                          const fallback = e.currentTarget.parentElement?.querySelector(".fallback-placeholder") as HTMLElement | null;
+                          if (fallback) fallback.style.display = "flex";
+                        }}
+                      />
+                    </>
+                  );
+                })()}
+
+                {/* Cover badge on first */}
+                {i === 0 && (
+                  <span className="absolute top-1 left-1 bg-gold text-noir text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded leading-none">
+                    Cover
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => removeImage(i)}
+                  className="absolute top-1 right-1 p-1 bg-black/70 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X size={12} />
+                </button>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
       )}
 
       {/* Drop zone */}
