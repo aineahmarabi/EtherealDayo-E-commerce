@@ -16,6 +16,7 @@ import type * as orders from "../orders.js";
 import type * as pageViews from "../pageViews.js";
 import type * as products from "../products.js";
 import type * as search from "../search.js";
+import type * as seed from "../seed.js";
 import type * as settings from "../settings.js";
 import type * as shipping from "../shipping.js";
 import type * as uploads from "../uploads.js";
@@ -36,6 +37,7 @@ declare const fullApi: ApiFromModules<{
   pageViews: typeof pageViews;
   products: typeof products;
   search: typeof search;
+  seed: typeof seed;
   settings: typeof settings;
   shipping: typeof shipping;
   uploads: typeof uploads;
