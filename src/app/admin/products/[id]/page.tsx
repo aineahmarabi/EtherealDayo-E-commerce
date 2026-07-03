@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, use } from "react";
+import { useState, use, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
@@ -8,7 +8,7 @@ import { Id } from "../../../../../convex/_generated/dataModel";
 import { formatPrice } from "@/lib/utils";
 import {
   ArrowLeft, Save, Plus, Trash2, Star, Eye, EyeOff,
-  Package, Edit3, CheckCircle2, X, AlertTriangle
+  Package, Edit3, CheckCircle2, X, AlertTriangle, UploadCloud
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -227,6 +227,9 @@ export default function ProductEditPage({ params }: { params: Promise<{ id: stri
   const [addingVariant, setAddingVariant] = useState(false);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const generateUploadUrl = useMutation(api.uploads.generateUploadUrl);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -237,7 +240,7 @@ export default function ProductEditPage({ params }: { params: Promise<{ id: stri
   const [form, setForm] = useState<null | {
     name: string; story: string; status: "active" | "draft"; isBestseller: boolean;
     family: string; perfumer: string; year: string; sillage: string; longevity: string; intensity: string;
-    notesTop: string; notesHeart: string; notesBase: string; images: string; brandId: string; audience: "her" | "him" | "unisex";
+    notesTop: string; notesHeart: string; notesBase: string; images: string[]; brandId: string; audience: "her" | "him" | "unisex";
   }>(null);
 
   // Hydrate form from product on load
@@ -256,7 +259,7 @@ export default function ProductEditPage({ params }: { params: Promise<{ id: stri
       notesTop: product.notesTop.join(", "),
       notesHeart: product.notesHeart.join(", "),
       notesBase: product.notesBase.join(", "),
-      images: product.images.join(", "),
+      images: product.images ?? [],
       brandId: product.brandId,
       audience: product.audience,
     });
@@ -265,6 +268,37 @@ export default function ProductEditPage({ params }: { params: Promise<{ id: stri
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     setForm(prev => prev ? { ...prev, [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value } : prev);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    setUploading(true);
+    try {
+      const newUrls = [...(form?.images ?? [])];
+      for (const file of Array.from(e.target.files)) {
+        const postUrl = await generateUploadUrl();
+        const result = await fetch(postUrl, {
+          method: "POST",
+          headers: { "Content-Type": file.type },
+          body: file,
+        });
+        const { storageId } = await result.json();
+        const deploymentUrl = process.env.NEXT_PUBLIC_CONVEX_URL!;
+        const url = `${deploymentUrl}/api/storage/${storageId}`;
+        newUrls.push(url);
+      }
+      setForm(prev => prev ? { ...prev, images: newUrls } : prev);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to upload image.");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const removeImage = (idx: number) => {
+    setForm(prev => prev ? { ...prev, images: prev.images.filter((_, i) => i !== idx) } : prev);
   };
 
   const handleSave = async () => {
@@ -278,7 +312,7 @@ export default function ProductEditPage({ params }: { params: Promise<{ id: stri
         story: form.story,
         status: form.status,
         isBestseller: form.isBestseller,
-        images: form.images.split(",").map(n => n.trim()).filter(Boolean),
+        images: form.images,
         sillage: Number(form.sillage),
         longevity: Number(form.longevity),
         intensity: Number(form.intensity),
@@ -454,20 +488,51 @@ export default function ProductEditPage({ params }: { params: Promise<{ id: stri
           </SectionCard>
 
           {/* Media */}
-          <SectionCard title="Media &amp; Images">
-            <FieldRow label="Image URLs (comma separated)">
-              <textarea name="images" value={form.images} onChange={handleChange} rows={3} className={inputCls + " resize-none"} />
-            </FieldRow>
-            {form.images && (
-              <div className="flex gap-2 flex-wrap mt-1">
-                {form.images.split(",").map(url => url.trim()).filter(Boolean).map((url, i) => (
-                  <div key={i} className="w-16 h-20 rounded-lg border border-gold/20 bg-noir/50 overflow-hidden">
+          <SectionCard title="Media & Images">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageUpload}
+              multiple
+              accept="image/*"
+              className="hidden"
+            />
+
+            {/* Uploaded previews */}
+            {form.images.length > 0 && (
+              <div className="flex gap-3 flex-wrap">
+                {form.images.map((url, i) => (
+                  <div key={i} className="relative group w-24 h-24 rounded-lg border border-gold/20 bg-noir/50 overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={url} alt="" className="w-full h-full object-cover" onError={e => (e.currentTarget.style.display = "none")} />
+                    <img src={url} alt="" className="w-full h-full object-cover" />
+                    {i === 0 && (
+                      <span className="absolute top-1 left-1 bg-gold text-noir text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded">Cover</span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeImage(i)}
+                      className="absolute top-1 right-1 p-1 bg-black/60 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X size={14} />
+                    </button>
                   </div>
                 ))}
               </div>
             )}
+
+            {/* Drop zone */}
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="border border-dashed border-gold/20 hover:border-gold/40 hover:bg-white/[0.02] transition-colors rounded-xl p-8 flex flex-col items-center justify-center gap-3 cursor-pointer"
+            >
+              <div className="p-3 bg-purple-900/30 rounded-full text-purple-400">
+                <UploadCloud size={20} />
+              </div>
+              <div className="text-center font-body">
+                <p className="text-[13px] text-bone">{uploading ? "Uploading..." : "Click to add photos"}</p>
+                <p className="text-[11px] text-muted-text mt-1">First photo becomes the cover image</p>
+              </div>
+            </div>
           </SectionCard>
         </div>
 
