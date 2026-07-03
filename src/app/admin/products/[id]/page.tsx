@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, use } from "react";
+import { useState, use, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
@@ -242,26 +242,28 @@ export default function ProductEditPage({ params }: { params: Promise<{ id: stri
   }>(null);
 
   // Hydrate form from product on load
-  if (product && !form) {
-    setForm({
-      name: product.name,
-      story: product.story,
-      status: product.status,
-      isBestseller: product.isBestseller,
-      family: product.family,
-      perfumer: product.perfumer,
-      year: String(product.year),
-      sillage: String(product.sillage),
-      longevity: String(product.longevity),
-      intensity: String(product.intensity),
-      notesTop: product.notesTop.join(", "),
-      notesHeart: product.notesHeart.join(", "),
-      notesBase: product.notesBase.join(", "),
-      images: product.images ?? [],
-      brandId: product.brandId,
-      audience: product.audience,
-    });
-  }
+  useEffect(() => {
+    if (product) {
+      setForm({
+        name: product.name,
+        story: product.story,
+        status: product.status,
+        isBestseller: product.isBestseller,
+        family: product.family,
+        perfumer: product.perfumer,
+        year: String(product.year),
+        sillage: String(product.sillage),
+        longevity: String(product.longevity),
+        intensity: String(product.intensity),
+        notesTop: product.notesTop.join(", "),
+        notesHeart: product.notesHeart.join(", "),
+        notesBase: product.notesBase.join(", "),
+        images: product.images ?? [],
+        brandId: product.brandId,
+        audience: product.audience,
+      });
+    }
+  }, [product?._id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
