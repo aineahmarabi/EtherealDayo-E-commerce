@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAdminAuth } from "@/store/adminAuthStore";
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 
 type NavItem = {
   href: string;
@@ -39,6 +41,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { isAuthenticated, logout } = useAdminAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  // Real-time badge counts
+  const allOrders = useQuery(api.orders.list, { limit: 999 });
+  const allInquiries = useQuery(api.inquiries.list, { unreadOnly: false });
+  const orderCount = allOrders?.length ?? 0;
+  const unreadInquiries = allInquiries?.filter(i => !i.read).length ?? 0;
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -120,6 +128,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {NAV_ITEMS.map((item) => {
             const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
             const Icon = item.icon;
+            const badge = item.href === "/admin/orders" ? orderCount
+              : item.href === "/admin/inquiries" ? unreadInquiries
+              : null;
             return (
               <Link
                 key={item.href}
@@ -133,7 +144,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               >
                 <Icon size={15} className={isActive ? "text-gold" : "text-muted-text group-hover:text-bone"} />
                 {item.label}
-                {isActive && <ChevronRight size={12} className="ml-auto text-gold/50" />}
+                <span className="ml-auto flex items-center gap-1">
+                  {badge != null && badge > 0 && (
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none ${
+                      item.href === "/admin/inquiries" ? "bg-dusty-rose text-noir" : "bg-gold text-noir"
+                    }`}>
+                      {badge > 99 ? "99+" : badge}
+                    </span>
+                  )}
+                  {isActive && !badge && <ChevronRight size={12} className="text-gold/50" />}
+                </span>
               </Link>
             );
           })}

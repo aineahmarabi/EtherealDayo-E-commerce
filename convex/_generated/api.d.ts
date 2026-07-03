@@ -13,6 +13,7 @@ import type * as customers from "../customers.js";
 import type * as discountCodes from "../discountCodes.js";
 import type * as inquiries from "../inquiries.js";
 import type * as orders from "../orders.js";
+import type * as pageViews from "../pageViews.js";
 import type * as products from "../products.js";
 import type * as search from "../search.js";
 import type * as settings from "../settings.js";
@@ -32,6 +33,7 @@ declare const fullApi: ApiFromModules<{
   discountCodes: typeof discountCodes;
   inquiries: typeof inquiries;
   orders: typeof orders;
+  pageViews: typeof pageViews;
   products: typeof products;
   search: typeof search;
   settings: typeof settings;

@@ -193,7 +193,7 @@ export default function CreateOrderPage() {
     name: "", email: "", phone: "",
   });
   const [address, setAddress] = useState({
-    line1: "", line2: "", city: "", state: "", zip: "", country: "US",
+    line1: "", line2: "", city: "", state: "", zip: "", country: "Kenya",
   });
   const [shipping, setShipping] = useState("0");
   const [taxRate, setTaxRate] = useState("0");
@@ -378,15 +378,15 @@ export default function CreateOrderPage() {
             <div className="grid sm:grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] text-muted-text uppercase tracking-widest font-body">Full Name *</label>
-                <input required value={customer.name} onChange={e => setCustomer(p => ({ ...p, name: e.target.value }))} className={inputCls} placeholder="Mary Diana" />
+                <input required value={customer.name} onChange={e => setCustomer(p => ({ ...p, name: e.target.value }))} className={inputCls} placeholder="Amani Ochieng" />
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] text-muted-text uppercase tracking-widest font-body">Email *</label>
-                <input required type="email" value={customer.email} onChange={e => setCustomer(p => ({ ...p, email: e.target.value }))} className={inputCls} placeholder="mary.diana@example.com" />
+                <input required type="email" value={customer.email} onChange={e => setCustomer(p => ({ ...p, email: e.target.value }))} className={inputCls} placeholder="amani.ochieng@gmail.com" />
               </div>
               <div className="flex flex-col gap-1.5 sm:col-span-2">
                 <label className="text-[10px] text-muted-text uppercase tracking-widest font-body">Phone (optional)</label>
-                <input value={customer.phone} onChange={e => setCustomer(p => ({ ...p, phone: e.target.value }))} className={inputCls} placeholder="+1 555 000 0000" />
+                <input value={customer.phone} onChange={e => setCustomer(p => ({ ...p, phone: e.target.value }))} className={inputCls} placeholder="+254 712 345 678" />
               </div>
             </div>
           </SectionCard>
@@ -405,7 +405,7 @@ export default function CreateOrderPage() {
                   <div className="grid sm:grid-cols-2 gap-3 pt-2">
                     <div className="sm:col-span-2 flex flex-col gap-1.5">
                       <label className="text-[10px] text-muted-text uppercase tracking-widest font-body">Street Line 1</label>
-                      <input value={address.line1} onChange={e => setAddress(p => ({ ...p, line1: e.target.value }))} className={inputCls} placeholder="123 Avenue du Parfum" />
+                      <input value={address.line1} onChange={e => setAddress(p => ({ ...p, line1: e.target.value }))} className={inputCls} placeholder="123 Kimathi Street" />
                     </div>
                     <div className="sm:col-span-2 flex flex-col gap-1.5">
                       <label className="text-[10px] text-muted-text uppercase tracking-widest font-body">Apartment, suite, etc.</label>
@@ -413,19 +413,19 @@ export default function CreateOrderPage() {
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[10px] text-muted-text uppercase tracking-widest font-body">City</label>
-                      <input value={address.city} onChange={e => setAddress(p => ({ ...p, city: e.target.value }))} className={inputCls} placeholder="Paris" />
+                      <input value={address.city} onChange={e => setAddress(p => ({ ...p, city: e.target.value }))} className={inputCls} placeholder="Nairobi" />
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[10px] text-muted-text uppercase tracking-widest font-body">State / Region</label>
-                      <input value={address.state} onChange={e => setAddress(p => ({ ...p, state: e.target.value }))} className={inputCls} placeholder="Île-de-France" />
+                      <input value={address.state} onChange={e => setAddress(p => ({ ...p, state: e.target.value }))} className={inputCls} placeholder="Nairobi County" />
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[10px] text-muted-text uppercase tracking-widest font-body">Postal Code</label>
-                      <input value={address.zip} onChange={e => setAddress(p => ({ ...p, zip: e.target.value }))} className={inputCls} placeholder="75001" />
+                      <input value={address.zip} onChange={e => setAddress(p => ({ ...p, zip: e.target.value }))} className={inputCls} placeholder="00100" />
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[10px] text-muted-text uppercase tracking-widest font-body">Country</label>
-                      <input value={address.country} onChange={e => setAddress(p => ({ ...p, country: e.target.value }))} className={inputCls} placeholder="France" />
+                      <input value={address.country} onChange={e => setAddress(p => ({ ...p, country: e.target.value }))} className={inputCls} placeholder="Kenya" />
                     </div>
                   </div>
                 </motion.div>
@@ -476,7 +476,7 @@ export default function CreateOrderPage() {
               {/* Shipping & Tax inputs */}
               <div className="border-t border-gold/10 pt-4 flex flex-col gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] text-muted-text uppercase tracking-widest font-body">Shipping ($)</label>
+                  <label className="text-[10px] text-muted-text uppercase tracking-widest font-body">Shipping (KES)</label>
                   <input type="number" min="0" value={shipping} onChange={e => setShipping(e.target.value)} className={inputCls + " text-xs py-2"} />
                 </div>
                 <div className="flex flex-col gap-1.5">

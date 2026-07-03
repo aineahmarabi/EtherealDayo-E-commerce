@@ -6,6 +6,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { SearchOverlay } from "@/components/search/SearchOverlay";
+import { PageTracker } from "@/components/layout/PageTracker";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -43,6 +44,7 @@ export default function RootLayout({
     >
       <body className="min-h-dvh bg-ink text-bone font-body antialiased">
         <ConvexClientProvider>
+          <PageTracker />
           <Navbar />
           <main>{children}</main>
           <Footer />

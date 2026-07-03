@@ -84,6 +84,7 @@ export default defineSchema({
     giftMessage: v.optional(v.string()),
     status: v.union(
       v.literal("new"),
+      v.literal("dispatched"),
       v.literal("fulfilled"),
       v.literal("refunded"),
       v.literal("cancelled")
@@ -147,4 +148,10 @@ export default defineSchema({
     price: v.number(),
     isActive: v.boolean(),
   }),
+
+  pageViews: defineTable({
+    path: v.string(),
+    date: v.string(), // YYYY-MM-DD
+    count: v.number(),
+  }).index("by_path_date", ["path", "date"]),
 });

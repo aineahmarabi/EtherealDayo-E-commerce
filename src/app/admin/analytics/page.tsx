@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { TrendingUp, ShoppingBag, Users, Search } from "lucide-react";
+import { TrendingUp, ShoppingBag, Users, Search, Eye, FileText } from "lucide-react";
 
 function formatKES(amount: number): string {
   return new Intl.NumberFormat("en-KE", {
@@ -35,6 +35,9 @@ export default function AnalyticsPage() {
 
   const metrics = useQuery(api.orders.metrics, { from, to });
   const searchMisses = useQuery(api.search.getMisses);
+  
+  const days = range === "7d" ? 7 : range === "30d" ? 30 : 90;
+  const pageViews = useQuery(api.pageViews.getSummary, { days });
 
   return (
     <div className="flex flex-col gap-8 max-w-5xl">
@@ -54,11 +57,12 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Metric cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: "Revenue", value: metrics ? formatKES(metrics.revenue) : undefined, icon: TrendingUp },
           { label: "Orders", value: metrics?.count, icon: ShoppingBag },
           { label: "Avg Order", value: metrics ? formatKES(metrics.avgOrder) : undefined, icon: Users },
+          { label: "Website Visits", value: pageViews?.totalVisits, icon: Eye },
         ].map(({ label, value, icon: Icon }) => (
           <div key={label} className="flex flex-col gap-3 p-6 rounded-2xl border border-gold/10 bg-bordeaux-deep/10">
             <div className="flex items-center justify-between">
@@ -74,36 +78,71 @@ export default function AnalyticsPage() {
         ))}
       </div>
 
-      {/* Search misses — what visitors searched that returned no results */}
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-2">
-          <Search size={14} className="text-muted-text" />
-          <h2 className="font-display text-base text-bone">Zero-Result Searches</h2>
-          <span className="text-[10px] text-muted-text font-body ml-auto">Terms visitors searched that found nothing — potential inventory gaps</span>
-        </div>
-        <div className="rounded-2xl border border-gold/10 overflow-hidden">
-          {searchMisses === undefined ? (
-            <div className="p-6 flex flex-col gap-3">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
-          ) : searchMisses.length === 0 ? (
-            <div className="py-12 text-center text-muted-text font-body">No zero-result searches recorded</div>
-          ) : (
-            <table className="w-full text-sm font-body">
-              <thead className="border-b border-gold/10 bg-bordeaux-deep/10">
-                <tr>
-                  <th className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-muted-text">Term</th>
-                  <th className="px-4 py-3 text-right text-[10px] tracking-widest uppercase text-muted-text">Times Searched</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gold/5">
-                {searchMisses.map((miss) => (
-                  <tr key={miss._id} className="hover:bg-bordeaux-deep/10 transition-colors">
-                    <td className="px-4 py-3 text-bone font-mono text-xs">{miss.term}</td>
-                    <td className="px-4 py-3 text-right text-muted-text">{miss.count}</td>
+      <div className="grid lg:grid-cols-2 gap-8">
+        {/* Search misses */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <Search size={14} className="text-muted-text" />
+            <h2 className="font-display text-base text-bone">Zero-Result Searches</h2>
+            <span className="text-[10px] text-muted-text font-body ml-auto">Terms with no results</span>
+          </div>
+          <div className="rounded-2xl border border-gold/10 overflow-hidden">
+            {searchMisses === undefined ? (
+              <div className="p-6 flex flex-col gap-3">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
+            ) : searchMisses.length === 0 ? (
+              <div className="py-12 text-center text-muted-text font-body">No zero-result searches recorded</div>
+            ) : (
+              <table className="w-full text-sm font-body">
+                <thead className="border-b border-gold/10 bg-bordeaux-deep/10">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-muted-text">Term</th>
+                    <th className="px-4 py-3 text-right text-[10px] tracking-widest uppercase text-muted-text">Count</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+                </thead>
+                <tbody className="divide-y divide-gold/5">
+                  {searchMisses.map((miss) => (
+                    <tr key={miss._id} className="hover:bg-bordeaux-deep/10 transition-colors">
+                      <td className="px-4 py-3 text-bone font-mono text-xs truncate max-w-[200px]">{miss.term}</td>
+                      <td className="px-4 py-3 text-right text-muted-text">{miss.count}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+
+        {/* Top Pages */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <FileText size={14} className="text-muted-text" />
+            <h2 className="font-display text-base text-bone">Top Pages</h2>
+            <span className="text-[10px] text-muted-text font-body ml-auto">Most visited URLs</span>
+          </div>
+          <div className="rounded-2xl border border-gold/10 overflow-hidden">
+            {pageViews === undefined ? (
+              <div className="p-6 flex flex-col gap-3">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
+            ) : pageViews.topPages.length === 0 ? (
+              <div className="py-12 text-center text-muted-text font-body">No visits recorded yet</div>
+            ) : (
+              <table className="w-full text-sm font-body">
+                <thead className="border-b border-gold/10 bg-bordeaux-deep/10">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-muted-text">Path</th>
+                    <th className="px-4 py-3 text-right text-[10px] tracking-widest uppercase text-muted-text">Views</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gold/5">
+                  {pageViews.topPages.map((page) => (
+                    <tr key={page.path} className="hover:bg-bordeaux-deep/10 transition-colors">
+                      <td className="px-4 py-3 text-bone font-mono text-xs truncate max-w-[200px]">{page.path}</td>
+                      <td className="px-4 py-3 text-right text-muted-text">{page.count}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
       </div>
     </div>

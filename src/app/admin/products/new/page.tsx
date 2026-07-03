@@ -4,7 +4,8 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
-import { ArrowLeft, UploadCloud, X, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, UploadCloud, X, Plus, Trash2, PlusCircle } from "lucide-react";
+import { slugify } from "@/lib/utils";
 
 type TempVariant = {
   id: string;
@@ -27,6 +28,33 @@ export default function NewProductPage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
+
+  // Quick-add brand
+  const [showBrandModal, setShowBrandModal] = useState(false);
+  const [brandForm, setBrandForm] = useState({ name: "", description: "" });
+  const [brandSaving, setBrandSaving] = useState(false);
+  const createBrand = useMutation(api.brands.create);
+
+  const handleCreateBrand = async () => {
+    if (!brandForm.name.trim()) return;
+    setBrandSaving(true);
+    try {
+      const id = await createBrand({
+        name: brandForm.name.trim(),
+        slug: slugify(brandForm.name.trim()),
+        description: brandForm.description.trim() || brandForm.name.trim(),
+        order: 999,
+      });
+      setForm(prev => ({ ...prev, brandId: id }));
+      setBrandForm({ name: "", description: "" });
+      setShowBrandModal(false);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create brand.");
+    } finally {
+      setBrandSaving(false);
+    }
+  };
   
   const [form, setForm] = useState({
     name: "",
@@ -215,7 +243,7 @@ export default function NewProductPage() {
           <div className={cardCls}>
             <div className="flex flex-col gap-1.5">
               <label className="text-[13px] text-bone font-body">Title</label>
-              <input required name="name" value={form.name} onChange={handleChange} className={inputCls} placeholder="Short sleeve t-shirt" />
+              <input required name="name" value={form.name} onChange={handleChange} className={inputCls} placeholder="e.g. Baccarat Rouge 540" />
             </div>
             <div className="flex flex-col gap-1.5 mt-2">
               <label className="text-[13px] text-bone font-body">Description</label>
@@ -467,7 +495,39 @@ export default function NewProductPage() {
             </div>
 
             <div className="flex flex-col gap-1.5 mt-2">
-              <label className="text-[13px] text-muted-text font-body">Vendor (Brand) *</label>
+              <div className="flex items-center justify-between">
+                <label className="text-[13px] text-muted-text font-body">Vendor (Brand) *</label>
+                <button
+                  type="button"
+                  onClick={() => setShowBrandModal(!showBrandModal)}
+                  className="flex items-center gap-1 text-[11px] text-purple-400 hover:text-purple-300 font-body transition-colors"
+                >
+                  <PlusCircle size={13} />
+                  Add Brand
+                </button>
+              </div>
+              {showBrandModal && (
+                <div className="p-3 rounded-lg bg-purple-950/40 border border-purple-700/40 flex flex-col gap-2">
+                  <input
+                    value={brandForm.name}
+                    onChange={e => setBrandForm(p => ({ ...p, name: e.target.value }))}
+                    placeholder="Brand name"
+                    className={inputCls + " text-xs py-1.5"}
+                  />
+                  <input
+                    value={brandForm.description}
+                    onChange={e => setBrandForm(p => ({ ...p, description: e.target.value }))}
+                    placeholder="Short description (optional)"
+                    className={inputCls + " text-xs py-1.5"}
+                  />
+                  <div className="flex gap-2">
+                    <button type="button" onClick={() => setShowBrandModal(false)} className="flex-1 py-1.5 text-xs text-muted-text hover:text-bone font-body border border-gold/15 rounded-lg transition-colors">Cancel</button>
+                    <button type="button" onClick={handleCreateBrand} disabled={brandSaving || !brandForm.name.trim()} className="flex-1 py-1.5 text-xs bg-purple-600/80 hover:bg-purple-600 text-white rounded-lg font-body transition-colors disabled:opacity-50">
+                      {brandSaving ? "Saving…" : "Create Brand"}
+                    </button>
+                  </div>
+                </div>
+              )}
               <select required name="brandId" value={form.brandId} onChange={handleChange} className={selectCls}>
                 <option value="">Select a brand</option>
                 {brands?.map((b) => (

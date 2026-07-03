@@ -30,7 +30,7 @@ export const list = query({
     if (status) {
       q = ctx.db
         .query("orders")
-        .withIndex("by_status", (idx) => idx.eq("status", status as "new" | "fulfilled" | "refunded" | "cancelled"))
+        .withIndex("by_status", (idx) => idx.eq("status", status as "new" | "dispatched" | "fulfilled" | "refunded" | "cancelled"))
         .order("desc");
     }
     const results = await q.collect();
@@ -111,6 +111,7 @@ export const updateStatus = mutation({
     id: v.id("orders"),
     status: v.union(
       v.literal("new"),
+      v.literal("dispatched"),
       v.literal("fulfilled"),
       v.literal("refunded"),
       v.literal("cancelled")
