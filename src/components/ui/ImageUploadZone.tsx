@@ -90,7 +90,8 @@ export function ImageUploadZone({ images, onChange }: Props) {
                   <>
                     {/* Fallback placeholder (hidden by default, shown via onError) */}
                     <div 
-                      className="fallback-placeholder hidden w-full h-full flex-col items-center justify-center p-2 bg-noir/80 text-muted-text text-[10px] text-center font-body gap-1"
+                      className="fallback-placeholder w-full h-full flex flex-col items-center justify-center p-2 bg-noir/80 text-muted-text text-[10px] text-center font-body gap-1"
+                      style={{ display: "none" }}
                     >
                       <span className="text-[14px]">⚠️</span>
                       <span>Missing File</span>
