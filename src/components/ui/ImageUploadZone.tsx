@@ -78,25 +78,38 @@ export function ImageUploadZone({ images, onChange }: Props) {
               key={i}
               className="relative group w-24 h-24 rounded-xl border border-gold/20 overflow-hidden bg-noir/50 flex-shrink-0 flex items-center justify-center"
             >
-              {/* Fallback placeholder (hidden by default, shown via onError) */}
-              <div 
-                className="fallback-placeholder hidden w-full h-full flex-col items-center justify-center p-2 bg-noir/80 text-muted-text text-[10px] text-center font-body gap-1"
-              >
-                <span className="text-[14px]">⚠️</span>
-                <span>Missing File</span>
-              </div>
+              {(() => {
+                const isWhitelisted = url.startsWith("http") && url.includes("/api/storage/");
 
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={url}
-                alt=""
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                  const fallback = e.currentTarget.parentElement?.querySelector(".fallback-placeholder") as HTMLElement | null;
-                  if (fallback) fallback.style.display = "flex";
-                }}
-              />
+                return !isWhitelisted ? (
+                  <div className="w-full h-full flex flex-col items-center justify-center p-2 bg-noir/80 text-muted-text text-[10px] text-center font-body gap-1">
+                    <span className="text-[14px]">⚠️</span>
+                    <span>Invalid Image</span>
+                  </div>
+                ) : (
+                  <>
+                    {/* Fallback placeholder (hidden by default, shown via onError) */}
+                    <div 
+                      className="fallback-placeholder hidden w-full h-full flex-col items-center justify-center p-2 bg-noir/80 text-muted-text text-[10px] text-center font-body gap-1"
+                    >
+                      <span className="text-[14px]">⚠️</span>
+                      <span>Missing File</span>
+                    </div>
+
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={url}
+                      alt=""
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                        const fallback = e.currentTarget.parentElement?.querySelector(".fallback-placeholder") as HTMLElement | null;
+                        if (fallback) fallback.style.display = "flex";
+                      }}
+                    />
+                  </>
+                );
+              })()}
 
               {/* Cover badge on first */}
               {i === 0 && (
