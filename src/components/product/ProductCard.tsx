@@ -51,6 +51,8 @@ export function ProductCard({ product }: { product: ProductLike }) {
     });
   };
 
+  const [imgError, setImgError] = useState(false);
+
   return (
     <motion.div
       variants={{
@@ -65,13 +67,14 @@ export function ProductCard({ product }: { product: ProductLike }) {
           transition={{ duration: 0.4, ease }}
           className="relative aspect-[4/5] w-full flex items-center justify-center"
         >
-          {image ? (
+          {image && !imgError ? (
             <Image
               src={image}
               alt={product.name}
               fill
               className="object-contain transition-transform duration-700 group-hover:scale-105"
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              onError={() => setImgError(true)}
             />
           ) : (
             <BottlePlaceholderCard />

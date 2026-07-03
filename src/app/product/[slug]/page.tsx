@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import { useQuery } from "convex/react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -77,21 +77,31 @@ function ScentPyramid({
 }
 
 function BottleDisplay({ image, name }: { image?: string; name: string }) {
-  if (image) {
+  const [imgError, setImgError] = useState(false);
+
+  if (image && !imgError) {
     return (
-      <div className="relative w-full aspect-[3/4] max-w-[300px] mx-auto flex items-center justify-center">
-        <Image src={image} alt={name} fill className="object-contain" sizes="(max-width: 1024px) 100vw, 300px" />
+      <div className="relative w-full aspect-[4/5] max-w-[360px] mx-auto flex items-end justify-center">
+        <Image
+          src={image}
+          alt={name}
+          fill
+          className="object-contain object-bottom"
+          sizes="(max-width: 1024px) 100vw, 360px"
+          onError={() => setImgError(true)}
+        />
       </div>
     );
   }
   return (
-    <div className="relative w-full aspect-[3/4] max-w-[300px] mx-auto rounded-2xl overflow-hidden bg-gradient-to-b from-bordeaux-deep/30 to-noir flex items-center justify-center border border-gold/10">
+    <div className="relative w-full aspect-[4/5] max-w-[360px] mx-auto flex items-end justify-center border border-gold/10 rounded-2xl bg-noir/40">
       {/* Ambient glow */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full bg-gold/5 blur-3xl" />
       {/* Bottle SVG placeholder */}
       <motion.div
         animate={{ y: [0, -8, 0] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        className="mb-8"
       >
         <svg viewBox="0 0 100 160" className="w-28 h-44" aria-hidden="true">
           <rect x="36" y="4" width="28" height="22" rx="5" fill="#C9A961" opacity="0.7" />
@@ -179,7 +189,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, ease }}
-              className="w-full max-w-[300px] mx-auto flex flex-col gap-4"
+              className="w-full max-w-[360px] mx-auto flex flex-col gap-4"
             >
               <BottleDisplay image={mainImage} name={product.name} />
               {/* Thumbnail strip */}
