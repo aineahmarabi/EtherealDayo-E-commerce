@@ -2,8 +2,9 @@
 
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Check } from "lucide-react";
+import { ShoppingBag, Check, Zap } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
+import { useRouter } from "next/navigation";
 import { cn, formatPrice } from "@/lib/utils";
 
 type Variant = {
@@ -23,6 +24,7 @@ type Props = {
 };
 
 export function AddToBag({ productId, productName, brandName, variants, image = "" }: Props) {
+  const router = useRouter();
   const { addItem, openCart } = useCartStore();
   const [selectedId, setSelectedId] = useState<string>(
     (variants[0]?.id ?? variants[0]?._id) ?? ""
@@ -53,6 +55,23 @@ export function AddToBag({ productId, productName, brandName, variants, image = 
       setAdded(false);
       openCart();
     }, 1200);
+  };
+
+  const handleBuyNow = () => {
+    if (!selectedVariant) return;
+    const vid = selectedVariant.id ?? selectedVariant._id ?? "";
+    addItem({
+      productId,
+      variantId: vid,
+      productName,
+      brandName,
+      size: selectedVariant.size,
+      concentration: selectedVariant.concentration,
+      price: selectedVariant.price,
+      quantity: 1,
+      image,
+    });
+    router.push("/checkout");
   };
 
   return (
@@ -87,46 +106,60 @@ export function AddToBag({ productId, productName, brandName, variants, image = 
         </p>
       )}
 
-      {/* Add to bag */}
-      <button
-        ref={btnRef}
-        onClick={handleAdd}
-        disabled={added}
-        className={cn(
-          "relative w-full py-4 rounded-full flex items-center justify-center gap-3",
-          "text-sm tracking-widest uppercase font-body transition-all duration-300 cursor-pointer",
-          added
-            ? "bg-gold/20 border border-gold text-gold"
-            : "bg-gold text-noir hover:bg-gold-soft"
-        )}
-        aria-label={`Add ${productName} to bag`}
-      >
-        <AnimatePresence mode="wait">
-          {added ? (
-            <motion.span
-              key="added"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className="flex items-center gap-2"
-            >
-              <Check size={16} />
-              Added to Bag
-            </motion.span>
-          ) : (
-            <motion.span
-              key="add"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className="flex items-center gap-2"
-            >
-              <ShoppingBag size={16} />
-              Add to Bag
-            </motion.span>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <button
+          ref={btnRef}
+          onClick={handleAdd}
+          disabled={added}
+          className={cn(
+            "relative flex-1 py-4 rounded-full flex items-center justify-center gap-3",
+            "text-sm tracking-widest uppercase font-body transition-all duration-300 cursor-pointer border",
+            added
+              ? "bg-gold/10 border-gold text-gold"
+              : "bg-transparent border-gold/30 text-bone hover:border-gold hover:text-gold hover:bg-gold/5"
           )}
-        </AnimatePresence>
-      </button>
+          aria-label={`Add ${productName} to bag`}
+        >
+          <AnimatePresence mode="wait">
+            {added ? (
+              <motion.span
+                key="added"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="flex items-center gap-2"
+              >
+                <Check size={16} />
+                Added
+              </motion.span>
+            ) : (
+              <motion.span
+                key="add"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="flex items-center gap-2"
+              >
+                <ShoppingBag size={16} />
+                Add to Bag
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </button>
+
+        <button
+          onClick={handleBuyNow}
+          className={cn(
+            "relative flex-1 py-4 rounded-full flex items-center justify-center gap-3",
+            "text-sm tracking-widest uppercase font-body transition-all duration-300 cursor-pointer",
+            "bg-gold text-noir hover:bg-gold-soft border border-transparent hover:border-gold"
+          )}
+          aria-label={`Buy ${productName} now`}
+        >
+          <Zap size={16} />
+          Buy it Now
+        </button>
+      </div>
     </div>
   );
 }

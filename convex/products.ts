@@ -13,7 +13,11 @@ async function withImageUrls(ctx: QueryCtx, product: any) {
     }
     return img;
   }));
-  return { ...product, images };
+  const variants = await ctx.db
+    .query("variants")
+    .withIndex("by_product", (q) => q.eq("productId", product._id))
+    .collect();
+  return { ...product, images, variants };
 }
 
 export const listActive = query({

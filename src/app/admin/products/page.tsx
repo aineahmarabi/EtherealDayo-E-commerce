@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { api } from "../../../../convex/_generated/api";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Plus, Search, Eye, EyeOff, Star } from "lucide-react";
@@ -65,14 +66,23 @@ export default function ProductsPage() {
               onClick={() => router.push(`/admin/products/${product._id}`)}
               className="group relative flex flex-col gap-2 p-3 rounded-xl border border-gold/10 bg-bordeaux-deep/10 hover:border-gold/25 transition-all cursor-pointer"
             >
-              {/* Placeholder image */}
               <div className="aspect-[4/5] rounded-lg bg-gradient-to-b from-bordeaux-deep/40 to-noir flex items-center justify-center relative overflow-hidden">
-                <svg viewBox="0 0 60 90" className="w-14 h-20 opacity-50" aria-hidden="true">
-                  <rect x="22" y="2" width="16" height="12" rx="3" fill="#C9A961" opacity="0.6" />
-                  <path d="M14 23 Q10 32 10 50 L10 78 Q10 86 30 86 Q50 86 50 78 L50 50 Q50 32 46 23 Z" fill="#1A1416" stroke="#C9A961" strokeWidth="1" strokeOpacity="0.35" />
-                </svg>
+                {product.images && product.images[0] ? (
+                  <Image
+                    src={product.images[0]}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  />
+                ) : (
+                  <svg viewBox="0 0 60 90" className="w-14 h-20 opacity-50" aria-hidden="true">
+                    <rect x="22" y="2" width="16" height="12" rx="3" fill="#C9A961" opacity="0.6" />
+                    <path d="M14 23 Q10 32 10 50 L10 78 Q10 86 30 86 Q50 86 50 78 L50 50 Q50 32 46 23 Z" fill="#1A1416" stroke="#C9A961" strokeWidth="1" strokeOpacity="0.35" />
+                  </svg>
+                )}
                 {/* Status badge */}
-                <div className={`absolute top-2 left-2 px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wider font-body ${product.status === "active" ? "bg-green-900/40 text-green-400" : "bg-bordeaux/30 text-dusty-rose"}`}>
+                <div className={`absolute top-2 left-2 px-1.5 py-0.5 rounded text-[9px] uppercase tracking-wider font-body ${product.status === "active" ? "bg-green-900/40 text-green-400" : "bg-bordeaux/30 text-dusty-rose"} z-10`}>
                   {product.status}
                 </div>
               </div>

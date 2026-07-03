@@ -185,7 +185,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               {/* Thumbnail strip */}
               {product.images.length > 1 && (
                 <div className="flex gap-3">
-                  {product.images.slice(0, 4).map((img, i) => (
+                  {product.images.slice(0, 4).map((img: string, i: number) => (
                     <div key={i} className="w-20 h-20 rounded-lg overflow-hidden border border-gold/20 bg-bordeaux-deep/30 flex-shrink-0">
                       <Image src={img} alt={`${product.name} view ${i + 1}`} width={80} height={80} className="w-full h-full object-cover" />
                     </div>
@@ -278,7 +278,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 whileInView="show"
                 viewport={{ once: true }}
                 variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
-                className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8"
+                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 lg:gap-6"
               >
                 {relatedProducts.map((p) => (
                   <ProductCard key={p._id} product={p} />

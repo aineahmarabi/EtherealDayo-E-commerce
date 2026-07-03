@@ -26,7 +26,7 @@ type ProductResult = {
   brandName: string;
   family: string;
   images: string[];
-  variants?: Array<{ price: number }>;
+  variants?: Array<{ _id: string; price: number; size: string; concentration: string }>;
 };
 
 export function CollectionPage({ label, title, subtitle, accentColor, queryName, audience, heroImageDesktop, heroImageMobile }: Props) {
@@ -112,7 +112,7 @@ export function CollectionPage({ label, title, subtitle, accentColor, queryName,
               initial="hidden"
               animate="show"
               variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07 } } }}
-              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8"
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 lg:gap-6"
             >
               {products.map((product) => (
                 <ProductCard key={product._id} product={product} />

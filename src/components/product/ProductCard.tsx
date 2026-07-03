@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { formatPrice } from "@/lib/utils";
+import { useCartStore } from "@/store/cartStore";
 
 type ProductLike = {
   _id: string;
@@ -12,7 +13,7 @@ type ProductLike = {
   brandName: string;
   family: string;
   images: string[];
-  variants?: Array<{ price: number }>;
+  variants?: Array<{ _id: string; price: number; size: string; concentration: string }>;
 };
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -23,6 +24,26 @@ export function ProductCard({ product }: { product: ProductLike }) {
     ? Math.min(...product.variants.map((v) => v.price))
     : null;
   const image = product.images?.[0];
+  const { addItem, openCart } = useCartStore();
+
+  const handleQuickAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!product.variants || product.variants.length === 0) return;
+    const v = product.variants[0];
+    addItem({
+      productId: product._id,
+      variantId: v._id,
+      productName: product.name,
+      brandName: product.brandName,
+      size: v.size,
+      concentration: v.concentration,
+      price: v.price,
+      quantity: 1,
+      image: image ?? "",
+    });
+    openCart();
+  };
 
   return (
     <motion.div
@@ -50,7 +71,19 @@ export function ProductCard({ product }: { product: ProductLike }) {
             <BottlePlaceholderCard />
           )}
           {/* Hover veil */}
-          <div className="absolute inset-0 bg-bordeaux-deep/0 group-hover:bg-bordeaux-deep/10 transition-colors duration-500" />
+          <div className="absolute inset-0 bg-bordeaux-deep/0 group-hover:bg-bordeaux-deep/40 transition-colors duration-500" />
+          
+          {/* Quick Add Button */}
+          {product.variants && product.variants.length > 0 && (
+            <div className="absolute bottom-4 left-4 right-4 translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-out z-10">
+              <button
+                onClick={handleQuickAdd}
+                className="w-full py-2.5 rounded-lg bg-gold text-noir text-[10px] tracking-widest uppercase font-body hover:bg-gold-soft transition-colors shadow-lg"
+              >
+                Quick Add
+              </button>
+            </div>
+          )}
         </motion.div>
 
         {/* Info */}
