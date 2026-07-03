@@ -9,6 +9,30 @@ import { api } from "../../../../convex/_generated/api";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Plus, Search, Eye, EyeOff, Star } from "lucide-react";
 
+function ProductGridImage({ src, alt }: { src: string; alt: string }) {
+  const [error, setError] = useState(false);
+
+  if (error) {
+    return (
+      <svg viewBox="0 0 60 90" className="w-14 h-20 opacity-50" aria-hidden="true">
+        <rect x="22" y="2" width="16" height="12" rx="3" fill="#C9A961" opacity="0.6" />
+        <path d="M14 23 Q10 32 10 50 L10 78 Q10 86 30 86 Q50 86 50 78 L50 50 Q50 32 46 23 Z" fill="#1A1416" stroke="#C9A961" strokeWidth="1" strokeOpacity="0.35" />
+      </svg>
+    );
+  }
+
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      className="object-cover"
+      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+      onError={() => setError(true)}
+    />
+  );
+}
+
 export default function ProductsPage() {
   const router = useRouter();
   const [search, setSearch] = useState("");
@@ -68,12 +92,9 @@ export default function ProductsPage() {
             >
               <div className="aspect-[4/5] rounded-lg bg-gradient-to-b from-bordeaux-deep/40 to-noir flex items-center justify-center relative overflow-hidden">
                 {product.images && product.images[0] ? (
-                  <Image
+                  <ProductGridImage
                     src={product.images[0]}
                     alt={product.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   />
                 ) : (
                   <svg viewBox="0 0 60 90" className="w-14 h-20 opacity-50" aria-hidden="true">
