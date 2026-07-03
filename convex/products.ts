@@ -3,31 +3,32 @@ import { v } from "convex/values";
 import { Id } from "./_generated/dataModel";
 
 async function withImageUrls(ctx: QueryCtx, product: any) {
-  const siteUrl = process.env.CONVEX_SITE_URL || "";
   const images = await Promise.all(product.images.map(async (img: string) => {
-    if (!img) return "";
+    if (!img) return null;
     if (img.includes("/api/storage/")) {
       const id = img.split("/api/storage/")[1].split("?")[0];
       try {
-        return (await ctx.storage.getUrl(id as Id<"_storage">)) ?? img;
+        return await ctx.storage.getUrl(id as Id<"_storage">);
       } catch {
-        return img;
+        return null;
       }
     }
     if (!img.includes("/") && img.trim() !== "") {
       try {
-        const url = await ctx.storage.getUrl(img as Id<"_storage">);
-        if (url) return url;
+        return await ctx.storage.getUrl(img as Id<"_storage">);
       } catch {}
-      return `${siteUrl}/api/storage/${img}`;
+      return null;
     }
     return img;
   }));
+  
+  const validImages = images.filter((img): img is string => img !== null && img !== "");
+
   const variants = await ctx.db
     .query("variants")
     .withIndex("by_product", (q) => q.eq("productId", product._id))
     .collect();
-  return { ...product, images, variants };
+  return { ...product, images: validImages, variants };
 }
 
 export const listActive = query({
