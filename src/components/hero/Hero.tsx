@@ -216,21 +216,23 @@ function MobileBottleImage({ src, name, accent }: { src: string; name: string; a
   const [error, setError] = useState(false);
   return (
     <motion.div
+      className="w-full h-full flex items-center justify-center"
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.55 }}
     >
       {error ? (
-        <BottleSVG accent={accent} className="w-12 h-20" />
+        <BottleSVG accent={accent} className="w-14 h-24" />
       ) : (
-        <div className="relative w-16 h-20 aspect-[3/4]">
+        /* Relative container: 60% wide, full available height, capped aspect */
+        <div className="relative" style={{ width: "60%", height: "100%", maxHeight: "100%" }}>
           <Image
             src={src}
             alt={name}
             fill
-            className="object-contain filter drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)]"
-            sizes="64px"
+            className="object-contain drop-shadow-[0_6px_16px_rgba(0,0,0,0.6)]"
+            sizes="(max-width: 640px) 30vw, 20vw"
             onError={() => setError(true)}
           />
         </div>
@@ -369,25 +371,35 @@ function DesktopColumnImage({ src, name, accent }: { src: string; name: string; 
       exit={{ opacity: 0 }}
       transition={{ duration: 0.7, ease: "easeInOut" }}
       className="absolute inset-0 overflow-hidden"
+      style={{ background: `linear-gradient(180deg, ${accent}08 0%, rgba(10,4,20,0.92) 100%)` }}
     >
-      <Image
-        src={src}
-        alt={name}
-        fill
-        className="object-contain transition-transform duration-700 ease-in-out group-hover:scale-105"
-        sizes="(max-width: 768px) 20vw, 20vw"
-        onError={() => setError(true)}
-      />
-      {/* dark overlay so text stays readable */}
+      {/* Image lives in a proportional centred box — not full-bleed */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-x-0 flex items-center justify-center"
+        style={{ top: "10%", bottom: "26%" }}
+      >
+        <div className="relative w-[72%] h-full">
+          <Image
+            src={src}
+            alt={name}
+            fill
+            className="object-contain transition-transform duration-700 ease-in-out group-hover:scale-105"
+            sizes="20vw"
+            onError={() => setError(true)}
+          />
+        </div>
+      </div>
+      {/* Bottom gradient — keeps label legible */}
+      <div
+        className="absolute inset-x-0 bottom-0"
         style={{
-          background: `linear-gradient(180deg, rgba(10,4,20,0.05) 0%, rgba(10,4,20,0.0) 40%, rgba(10,4,20,0.65) 78%, rgba(10,4,20,0.95) 100%)`,
+          height: "35%",
+          background: `linear-gradient(0deg, rgba(10,4,20,0.97) 0%, rgba(10,4,20,0.6) 60%, transparent 100%)`,
         }}
       />
-      {/* subtle accent tint */}
+      {/* Hover accent tint */}
       <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-[0.08] transition-opacity duration-700"
+        className="absolute inset-0 opacity-0 group-hover:opacity-[0.07] transition-opacity duration-700"
         style={{ backgroundColor: accent }}
       />
     </motion.div>
