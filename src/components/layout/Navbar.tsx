@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { ShoppingBag, Search, Menu, X } from "lucide-react";
@@ -9,6 +10,7 @@ import { useCartStore, useSearchStore } from "@/store/cartStore";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { cn } from "@/lib/utils";
+import { getBrandImage } from "@/lib/brandImages";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -125,9 +127,18 @@ export function Navbar() {
                               className="flex items-center gap-3 px-4 py-2.5 text-sm text-bone/70 hover:text-bone hover:bg-bordeaux-deep/40 transition-colors font-body"
                               onClick={() => setBrandDropOpen(false)}
                             >
-                              <span className="w-6 h-6 rounded-sm bg-bordeaux-deep border border-gold/20 flex items-center justify-center text-[9px] text-gold font-display">
-                                {brand.name.charAt(0)}
-                              </span>
+                              {(() => {
+                                const img = getBrandImage(brand.slug);
+                                return img ? (
+                                  <span className="w-6 h-6 rounded-full overflow-hidden bg-white flex items-center justify-center flex-shrink-0">
+                                    <Image src={img} alt={brand.name} width={20} height={20} className="object-contain w-5 h-5" />
+                                  </span>
+                                ) : (
+                                  <span className="w-6 h-6 rounded-sm bg-bordeaux-deep border border-gold/20 flex items-center justify-center text-[9px] text-gold font-display flex-shrink-0">
+                                    {brand.name.charAt(0)}
+                                  </span>
+                                );
+                              })()}
                               {brand.name}
                             </Link>
                           ))
