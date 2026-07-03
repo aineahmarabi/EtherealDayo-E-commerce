@@ -34,7 +34,8 @@ export default function BrandsPage() {
         body: file,
       });
       const { storageId } = await result.json();
-      const deploymentUrl = process.env.NEXT_PUBLIC_CONVEX_URL!;
+      const rawUrl = process.env.NEXT_PUBLIC_CONVEX_SITE_URL || process.env.NEXT_PUBLIC_CONVEX_URL || "";
+      const deploymentUrl = rawUrl.replace(".cloud", ".site").replace(/\/$/, "");
       const url = `${deploymentUrl}/api/storage/${storageId}`;
       setLogoUrl(url);
     } catch (err) {

@@ -31,7 +31,8 @@ export function ImageUploadZone({ images, onChange }: Props) {
             body: file,
           });
           const { storageId } = await res.json();
-          const deploymentUrl = process.env.NEXT_PUBLIC_CONVEX_URL!;
+          const rawUrl = process.env.NEXT_PUBLIC_CONVEX_SITE_URL || process.env.NEXT_PUBLIC_CONVEX_URL || "";
+          const deploymentUrl = rawUrl.replace(".cloud", ".site").replace(/\/$/, "");
           newUrls.push(`${deploymentUrl}/api/storage/${storageId}`);
         }
         onChange(newUrls);
