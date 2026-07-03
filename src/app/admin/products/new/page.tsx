@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
-import { ArrowLeft, UploadCloud, X, Plus, Trash2, PlusCircle } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, PlusCircle } from "lucide-react";
 import { slugify } from "@/lib/utils";
+import { ImageUploadZone } from "@/components/ui/ImageUploadZone";
 
 type TempVariant = {
   id: string;
@@ -21,12 +22,7 @@ export default function NewProductPage() {
   const brands = useQuery(api.brands.list);
   const createProduct = useMutation(api.products.create);
   const createVariant = useMutation(api.variants.create);
-  const generateUploadUrl = useMutation(api.uploads.generateUploadUrl);
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  
   const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
 
   // Quick-add brand
@@ -116,31 +112,6 @@ export default function NewProductPage() {
     setVariants(prev => prev.filter(v => v.id !== id));
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) return;
-    setUploading(true);
-    try {
-      const newUrls = [...uploadedUrls];
-      for (const file of Array.from(e.target.files)) {
-        const postUrl = await generateUploadUrl();
-        const result = await fetch(postUrl, {
-          method: "POST",
-          headers: { "Content-Type": file.type },
-          body: file,
-        });
-        const { storageId } = await result.json();
-        const deploymentUrl = process.env.NEXT_PUBLIC_CONVEX_URL!;
-        const url = `${deploymentUrl}/api/storage/${storageId}`;
-        newUrls.push(url);
-      }
-      setUploadedUrls(newUrls);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to upload image.");
-    } finally {
-      setUploading(false);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -254,35 +225,10 @@ export default function NewProductPage() {
           {/* Media */}
           <div className={cardCls}>
             <h2 className="text-[15px] text-bone font-medium">Media</h2>
-            {uploadedUrls.length > 0 && (
-            <div className="flex gap-4 flex-wrap mb-2">
-                {uploadedUrls.map((url, i) => (
-                  <div key={i} className="relative group w-24 h-24 rounded-lg border border-gold/20 overflow-hidden bg-noir/50">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={url} alt="" className="w-full h-full object-cover" />
-                    {i === 0 && (
-                      <span className="absolute top-1 left-1 bg-gold text-noir text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded">Cover</span>
-                    )}
-                    <button type="button" onClick={() => setUploadedUrls(prev => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 p-1 bg-black/60 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                      <X size={14} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-            <div 
-              onClick={() => fileInputRef.current?.click()}
-              className="border border-dashed border-gold/20 hover:border-gold/40 hover:bg-white/[0.02] transition-colors rounded-xl p-8 flex flex-col items-center justify-center gap-3 cursor-pointer"
-            >
-              <input type="file" ref={fileInputRef} onChange={handleImageUpload} multiple accept="image/*" className="hidden" />
-              <div className="p-3 bg-purple-900/30 rounded-full text-purple-400">
-                <UploadCloud size={20} />
-              </div>
-              <div className="text-center font-body">
-                <p className="text-[13px] text-bone">{uploading ? "Uploading..." : "Add media"}</p>
-                <p className="text-[11px] text-muted-text mt-1">Accepts images</p>
-              </div>
-            </div>
+            <ImageUploadZone
+              images={uploadedUrls}
+              onChange={setUploadedUrls}
+            />
           </div>
 
           {/* Category (Fragrance Profile) */}
