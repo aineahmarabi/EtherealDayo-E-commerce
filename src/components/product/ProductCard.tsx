@@ -63,14 +63,14 @@ export function ProductCard({ product }: { product: ProductLike }) {
         <motion.div
           whileHover={{ y: -4 }}
           transition={{ duration: 0.4, ease }}
-          className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-gradient-to-b from-white/[0.04] to-white/[0.01] flex items-center justify-center p-4 border border-gold/5"
+          className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-gradient-to-b from-bordeaux-deep/40 to-noir flex items-center justify-center"
         >
           {image ? (
             <Image
               src={image}
               alt={product.name}
               fill
-              className="object-contain p-4 transition-transform duration-700 group-hover:scale-105"
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
           ) : (
