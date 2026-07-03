@@ -3,10 +3,12 @@
 import { useQuery } from "convex/react";
 import { motion } from "framer-motion";
 import { use } from "react";
+import Image from "next/image";
 import { api } from "../../../../convex/_generated/api";
 import { ProductCard } from "@/components/product/ProductCard";
 import { CollectionGridSkeleton } from "@/components/ui/Skeleton";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { getBrandImage } from "@/lib/brandImages";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -18,48 +20,85 @@ export default function BrandPage({ params }: { params: Promise<{ slug: string }
     brand?._id ? { brandId: brand._id } : "skip"
   );
 
+  const heroImage = getBrandImage(slug);
+
   return (
     <div className="min-h-dvh bg-ink">
-      {/* Header */}
-      <section className="relative pt-40 pb-16 px-4 sm:px-6 lg:px-8 border-b border-gold/5">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full blur-3xl opacity-10 bg-gold pointer-events-none" />
-        <div className="max-w-7xl mx-auto relative">
-          {brand === undefined ? (
-            <div className="flex flex-col gap-3">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-12 w-72" />
-              <Skeleton className="h-4 w-full max-w-lg" />
-              <Skeleton className="h-4 w-4/5 max-w-md" />
-            </div>
-          ) : brand === null ? (
-            <div>
-              <h1 className="font-display text-4xl text-bone">Brand not found</h1>
-            </div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease }}
-              className="flex flex-col gap-4"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full border border-gold/40 flex items-center justify-center">
-                  <span className="font-display text-2xl text-gold">{brand.name.charAt(0)}</span>
-                </div>
-                <div>
-                  <span className="text-[11px] tracking-[0.35em] uppercase font-body text-gold block">The House</span>
-                  <h1 className="font-display text-3xl md:text-5xl text-bone tracking-tight">{brand.name}</h1>
-                </div>
+      {/* ── Hero banner ─────────────────────────────────────────── */}
+      <section className="relative h-[58vh] min-h-[340px] overflow-hidden">
+        {/* Background silhouette */}
+        {heroImage ? (
+          <>
+            <Image
+              src={heroImage}
+              alt={brand?.name ?? slug}
+              fill
+              priority
+              className="object-cover object-center"
+              sizes="100vw"
+            />
+            {/* Dark gradient overlay so text is readable */}
+            <div className="absolute inset-0 bg-gradient-to-r from-noir/90 via-noir/60 to-noir/20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-transparent" />
+          </>
+        ) : (
+          /* No image — plain dark gradient */
+          <>
+            <div className="absolute inset-0 bg-gradient-to-br from-bordeaux-deep/40 via-noir to-ink" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl opacity-10 bg-gold pointer-events-none" />
+          </>
+        )}
+
+        {/* Content — bottom-left, above overlay */}
+        <div className="absolute inset-0 flex items-end">
+          <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pb-12">
+            {brand === undefined ? (
+              <div className="flex flex-col gap-3">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-12 w-72" />
+                <Skeleton className="h-4 w-full max-w-lg" />
               </div>
-              <p className="text-muted-text font-body text-base max-w-xl leading-relaxed">
-                {brand.description}
-              </p>
-            </motion.div>
-          )}
+            ) : brand === null ? (
+              <h1 className="font-display text-4xl text-bone">Brand not found</h1>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, ease }}
+                className="flex flex-col gap-4"
+              >
+                <div className="flex items-center gap-4">
+                  {/* Brand logo circle */}
+                  {heroImage ? (
+                    <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gold/60 shadow-lg shadow-gold/10">
+                      <Image
+                        src={heroImage}
+                        alt={brand.name}
+                        width={56}
+                        height={56}
+                        className="object-cover w-full h-full"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-14 h-14 rounded-full border border-gold/40 flex items-center justify-center">
+                      <span className="font-display text-2xl text-gold">{brand.name.charAt(0)}</span>
+                    </div>
+                  )}
+                  <div>
+                    <span className="text-[11px] tracking-[0.35em] uppercase font-body text-gold block">The House</span>
+                    <h1 className="font-display text-3xl md:text-5xl text-bone tracking-tight">{brand.name}</h1>
+                  </div>
+                </div>
+                <p className="text-muted-text font-body text-base max-w-xl leading-relaxed">
+                  {brand.description}
+                </p>
+              </motion.div>
+            )}
+          </div>
         </div>
       </section>
 
-      {/* Products */}
+      {/* ── Products grid ───────────────────────────────────────── */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {products === undefined || products.length === 0 ? (

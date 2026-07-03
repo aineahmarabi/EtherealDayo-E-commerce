@@ -2,11 +2,13 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { CollectionGridSkeleton, BrandCardSkeleton } from "@/components/ui/Skeleton";
 import { ProductCard } from "@/components/product/ProductCard";
 import { ArrowRight } from "lucide-react";
+import { getBrandImage } from "@/lib/brandImages";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -116,10 +118,25 @@ function BrandsRow() {
                   href={`/brand/${brand.slug}`}
                   className="group flex flex-col items-center gap-3 p-6 rounded-2xl border border-gold/10 bg-bordeaux-deep/10 hover:border-gold/30 hover:bg-bordeaux-deep/20 transition-all duration-500"
                 >
-                  {/* Brand monogram */}
-                  <div className="w-12 h-12 rounded-full border border-gold/30 flex items-center justify-center group-hover:border-gold/60 transition-colors">
-                    <span className="font-display text-lg text-gold">{brand.name.charAt(0)}</span>
-                  </div>
+                  {/* Brand logo / monogram */}
+                  {(() => {
+                    const img = getBrandImage(brand.slug);
+                    return img ? (
+                      <div className="w-16 h-16 rounded-full overflow-hidden border border-gold/20 group-hover:border-gold/50 transition-colors flex items-center justify-center bg-white/5">
+                        <Image
+                          src={img}
+                          alt={brand.name}
+                          width={64}
+                          height={64}
+                          className="object-cover w-full h-full"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-12 h-12 rounded-full border border-gold/30 flex items-center justify-center group-hover:border-gold/60 transition-colors">
+                        <span className="font-display text-lg text-gold">{brand.name.charAt(0)}</span>
+                      </div>
+                    );
+                  })()}
                   <span className="text-sm font-display text-bone text-center leading-tight">{brand.name}</span>
                   <p className="text-xs text-muted-text font-body text-center line-clamp-2">{brand.description}</p>
                 </Link>
