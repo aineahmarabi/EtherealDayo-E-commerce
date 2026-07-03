@@ -171,7 +171,7 @@ export function SearchOverlay() {
                             </div>
                             {minPrice && (
                               <span className="text-sm text-gold font-body flex-shrink-0">
-                                from {formatPrice(minPrice)}
+                                {formatPrice(minPrice)}
                               </span>
                             )}
                           </Link>

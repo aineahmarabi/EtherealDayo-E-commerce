@@ -97,7 +97,7 @@ export function ProductCard({ product }: { product: ProductLike }) {
           <span className="text-[11px] text-muted-text font-body">{product.family}</span>
           {minPrice !== null && (
             <span className="text-sm text-bone/70 font-body mt-0.5">
-              from {formatPrice(minPrice)}
+              {formatPrice(minPrice)}
             </span>
           )}
         </div>
