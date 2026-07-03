@@ -16,46 +16,65 @@ const ParticleCloud = dynamic(
 
 const ease = [0.2, 0.8, 0.2, 1] as const;
 
-/* Navbar is 64px (h-16). Cards fill from the very bottom of the navbar to the bottom of the viewport. */
+/* ──────────────────────────────────────────────────────────────
+   Deduplicated product assignment
+   Each world gets a cycling index that is offset by its column
+   position, so no two columns ever show the same product at once.
+   ────────────────────────────────────────────────────────────── */
+function useProductAssignments(activeProducts: Array<{ _id: string; name: string; images: string[]; audience: string; isBestseller: boolean; publishedAt?: number }> | undefined) {
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    const t = setInterval(() => setTick((p) => p + 1), 3000);
+    return () => clearInterval(t);
+  }, []);
+
+  if (!activeProducts || activeProducts.length === 0) {
+    return WORLDS.map(() => null) as (null)[];
+  }
+
+  // Build per-world candidate lists (same logic as before)
+  const pools: Array<typeof activeProducts> = WORLDS.map((world) => {
+    switch (world.id) {
+      case "her":
+        return activeProducts.filter((p) => p.audience === "her" || p.audience === "unisex");
+      case "him":
+        return activeProducts.filter((p) => p.audience === "him" || p.audience === "unisex");
+      case "bestsellers":
+        return activeProducts.filter((p) => p.isBestseller);
+      case "new-arrivals":
+        return [...activeProducts].sort((a, b) => (b.publishedAt ?? 0) - (a.publishedAt ?? 0)).slice(0, 8);
+      default:
+        return [];
+    }
+  });
+
+  // Fallback: if any pool is empty, use the full list
+  const filledPools = pools.map((p) => (p.length > 0 ? p : activeProducts));
+
+  // Deduplicate: greedily pick each world's product starting from
+  // (tick + colIndex) and skip any already picked by an earlier column.
+  const usedIds = new Set<string>();
+  return filledPools.map((pool, colIndex) => {
+    const n = pool.length;
+    for (let offset = 0; offset < n; offset++) {
+      const candidate = pool[(tick + colIndex + offset) % n];
+      if (!usedIds.has(candidate._id)) {
+        usedIds.add(candidate._id);
+        return { image: candidate.images?.[0] ?? "", name: candidate.name };
+      }
+    }
+    // All products already used — just show the tick-rotated one (graceful fallback)
+    const fallback = pool[(tick + colIndex) % n];
+    return { image: fallback.images?.[0] ?? "", name: fallback.name };
+  });
+}
+
+/* ────────────────────────────────────────────────────────────── */
 
 export function Hero() {
   const activeProducts = useQuery(api.products.listActive);
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveIndex((prev) => prev + 1);
-    }, 3000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const getProductForWorld = (worldId: string) => {
-    if (!activeProducts || activeProducts.length === 0) return null;
-    let filtered = [];
-    switch (worldId) {
-      case "her":
-        filtered = activeProducts.filter((p) => p.audience === "her" || p.audience === "unisex");
-        break;
-      case "him":
-        filtered = activeProducts.filter((p) => p.audience === "him" || p.audience === "unisex");
-        break;
-      case "bestsellers":
-        filtered = activeProducts.filter((p) => p.isBestseller);
-        break;
-      case "new-arrivals":
-        filtered = [...activeProducts].sort((a, b) => (b.publishedAt || 0) - (a.publishedAt || 0)).slice(0, 8);
-        break;
-      default:
-        filtered = [];
-    }
-
-    if (filtered.length === 0) return null;
-    const prod = filtered[activeIndex % filtered.length];
-    return {
-      image: prod.images?.[0] || "",
-      name: prod.name,
-    };
-  };
+  const assignments = useProductAssignments(activeProducts);
 
   return (
     <section
@@ -83,15 +102,15 @@ export function Hero() {
         style={{ top: "64px" }} /* exactly below navbar */
       >
         {/* Outer left — For Her */}
-        <WorldColumn world={WORLDS[0]} flex={1} pyramidOffset="10%" delay={0.15} productInfo={getProductForWorld(WORLDS[0].id)} />
+        <WorldColumn world={WORLDS[0]} flex={1} pyramidOffset="10%" delay={0.15} productInfo={assignments[0]} />
         {/* Inner left — For Him */}
-        <WorldColumn world={WORLDS[1]} flex={1.1} pyramidOffset="5%" delay={0.2} productInfo={getProductForWorld(WORLDS[1].id)} />
+        <WorldColumn world={WORLDS[1]} flex={1.1} pyramidOffset="5%" delay={0.2} productInfo={assignments[1]} />
         {/* Center — Brand Anchor */}
         <BrandColumn />
         {/* Inner right — Bestsellers */}
-        <WorldColumn world={WORLDS[2]} flex={1.1} pyramidOffset="5%" delay={0.2} productInfo={getProductForWorld(WORLDS[2].id)} />
+        <WorldColumn world={WORLDS[2]} flex={1.1} pyramidOffset="5%" delay={0.2} productInfo={assignments[2]} />
         {/* Outer right — New Arrivals */}
-        <WorldColumn world={WORLDS[3]} flex={1} pyramidOffset="10%" delay={0.15} productInfo={getProductForWorld(WORLDS[3].id)} />
+        <WorldColumn world={WORLDS[3]} flex={1} pyramidOffset="10%" delay={0.15} productInfo={assignments[3]} />
       </div>
 
       {/* ============================================================
@@ -121,7 +140,7 @@ export function Hero() {
         {/* 2×2 grid — fills remaining height */}
         <div className="grid grid-cols-2 gap-3 flex-1 pb-3">
           {WORLDS.map((world, i) => {
-            const productInfo = getProductForWorld(world.id);
+            const productInfo = assignments[i];
             return (
               <motion.div
                 key={world.id}
@@ -150,22 +169,7 @@ export function Hero() {
                     <div className="flex-1 flex items-center justify-center p-3 relative w-full h-full min-h-[96px]">
                       <AnimatePresence mode="wait">
                         {productInfo && productInfo.image ? (
-                          <motion.div
-                            key={productInfo.image}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            transition={{ duration: 0.55 }}
-                            className="relative w-16 h-20 aspect-[3/4]"
-                          >
-                            <Image
-                              src={productInfo.image}
-                              alt={productInfo.name}
-                              fill
-                              className="object-contain filter drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)]"
-                              sizes="64px"
-                            />
-                          </motion.div>
+                          <MobileBottleImage key={productInfo.image} src={productInfo.image} name={productInfo.name} accent={world.accent} />
                         ) : (
                           <motion.div
                             key="svg-placeholder"
@@ -206,6 +210,36 @@ export function Hero() {
 }
 
 /* ------------------------------------------------------------------ */
+/* Mobile bottle image with error fallback                             */
+/* ------------------------------------------------------------------ */
+function MobileBottleImage({ src, name, accent }: { src: string; name: string; accent: string }) {
+  const [error, setError] = useState(false);
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      transition={{ duration: 0.55 }}
+    >
+      {error ? (
+        <BottleSVG accent={accent} className="w-12 h-20" />
+      ) : (
+        <div className="relative w-16 h-20 aspect-[3/4]">
+          <Image
+            src={src}
+            alt={name}
+            fill
+            className="object-contain filter drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)]"
+            sizes="64px"
+            onError={() => setError(true)}
+          />
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* World column — fills full height, pyramid via top offset            */
 /* ------------------------------------------------------------------ */
 function WorldColumn({
@@ -241,34 +275,7 @@ function WorldColumn({
             {/* ── Background: product image OR dark gradient ── */}
             <AnimatePresence mode="wait">
               {productInfo && productInfo.image ? (
-                <motion.div
-                  key={productInfo.image}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.7, ease: "easeInOut" }}
-                  className="absolute inset-0 overflow-hidden"
-                >
-                  <Image
-                    src={productInfo.image}
-                    alt={productInfo.name}
-                    fill
-                    className="object-cover object-top transition-transform duration-700 ease-in-out group-hover:scale-110"
-                    sizes="(max-width: 768px) 20vw, 20vw"
-                  />
-                  {/* dark overlay so text stays readable */}
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background: `linear-gradient(180deg, rgba(10,4,20,0.15) 0%, rgba(10,4,20,0.05) 40%, rgba(10,4,20,0.75) 75%, rgba(10,4,20,0.96) 100%)`,
-                    }}
-                  />
-                  {/* subtle accent tint */}
-                  <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-[0.08] transition-opacity duration-700"
-                    style={{ backgroundColor: world.accent }}
-                  />
-                </motion.div>
+                <DesktopColumnImage key={productInfo.image} src={productInfo.image} name={productInfo.name} accent={world.accent} />
               ) : (
                 <motion.div
                   key="dark-bg"
@@ -328,6 +335,62 @@ function WorldColumn({
         </Link>
       </motion.div>
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Desktop column image with error fallback                            */
+/* ------------------------------------------------------------------ */
+function DesktopColumnImage({ src, name, accent }: { src: string; name: string; accent: string }) {
+  const [error, setError] = useState(false);
+
+  if (error) {
+    return (
+      <motion.div
+        key="dark-bg-fallback"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
+        className="absolute inset-0"
+        style={{ background: `linear-gradient(180deg, ${accent}0c 0%, rgba(10,4,20,0.93) 65%)` }}
+      >
+        <div className="absolute inset-0 flex items-center justify-center">
+          <BottleSVG accent={accent} className="w-20 h-32 md:w-24 md:h-36 opacity-70" />
+        </div>
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.7, ease: "easeInOut" }}
+      className="absolute inset-0 overflow-hidden"
+    >
+      <Image
+        src={src}
+        alt={name}
+        fill
+        className="object-cover object-top transition-transform duration-700 ease-in-out group-hover:scale-110"
+        sizes="(max-width: 768px) 20vw, 20vw"
+        onError={() => setError(true)}
+      />
+      {/* dark overlay so text stays readable */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `linear-gradient(180deg, rgba(10,4,20,0.15) 0%, rgba(10,4,20,0.05) 40%, rgba(10,4,20,0.75) 75%, rgba(10,4,20,0.96) 100%)`,
+        }}
+      />
+      {/* subtle accent tint */}
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-[0.08] transition-opacity duration-700"
+        style={{ backgroundColor: accent }}
+      />
+    </motion.div>
   );
 }
 
