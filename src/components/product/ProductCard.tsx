@@ -24,7 +24,7 @@ export function ProductCard({ product }: { product: ProductLike }) {
     ? Math.min(...product.variants.map((v) => v.price))
     : null;
   const image = product.images?.[0];
-  const { addItem, openCart } = useCartStore();
+  const { addItem, triggerFly } = useCartStore();
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -42,7 +42,13 @@ export function ProductCard({ product }: { product: ProductLike }) {
       quantity: 1,
       image: image ?? "",
     });
-    openCart();
+    // Fire shooting-star animation from the button
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    triggerFly({
+      fromX: rect.left + rect.width / 2,
+      fromY: rect.top + rect.height / 2,
+      image: image || undefined,
+    });
   };
 
   return (

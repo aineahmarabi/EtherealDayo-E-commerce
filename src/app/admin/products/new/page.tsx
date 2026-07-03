@@ -255,11 +255,14 @@ export default function NewProductPage() {
           <div className={cardCls}>
             <h2 className="text-[15px] text-bone font-medium">Media</h2>
             {uploadedUrls.length > 0 && (
-              <div className="flex gap-4 flex-wrap mb-2">
+            <div className="flex gap-4 flex-wrap mb-2">
                 {uploadedUrls.map((url, i) => (
                   <div key={i} className="relative group w-24 h-24 rounded-lg border border-gold/20 overflow-hidden bg-noir/50">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={url} alt="" className="w-full h-full object-cover" />
+                    {i === 0 && (
+                      <span className="absolute top-1 left-1 bg-gold text-noir text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded">Cover</span>
+                    )}
                     <button type="button" onClick={() => setUploadedUrls(prev => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 p-1 bg-black/60 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity">
                       <X size={14} />
                     </button>

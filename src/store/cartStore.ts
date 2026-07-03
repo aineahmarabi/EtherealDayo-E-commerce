@@ -2,9 +2,16 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { CartItem } from "@/lib/types";
 
+type FlyEvent = {
+  fromX: number;
+  fromY: number;
+  image?: string;
+};
+
 type CartStore = {
   items: CartItem[];
   isOpen: boolean;
+  flyQueue: FlyEvent[];
   openCart: () => void;
   closeCart: () => void;
   addItem: (item: CartItem) => void;
@@ -13,6 +20,8 @@ type CartStore = {
   clearCart: () => void;
   total: () => number;
   itemCount: () => number;
+  triggerFly: (event: FlyEvent) => void;
+  consumeFly: () => void;
 };
 
 export const useCartStore = create<CartStore>()(
@@ -20,9 +29,16 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       isOpen: false,
+      flyQueue: [],
 
       openCart: () => set({ isOpen: true }),
       closeCart: () => set({ isOpen: false }),
+
+      triggerFly: (event) =>
+        set({ flyQueue: [...get().flyQueue, event] }),
+
+      consumeFly: () =>
+        set({ flyQueue: get().flyQueue.slice(1) }),
 
       addItem: (item) => {
         const existing = get().items.find((i) => i.variantId === item.variantId);
@@ -65,6 +81,11 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: "ethereal-dayo-cart",
+      // Don't persist flyQueue across sessions
+      partialize: (state) => ({
+        items: state.items,
+        isOpen: state.isOpen,
+      }),
     }
   )
 );

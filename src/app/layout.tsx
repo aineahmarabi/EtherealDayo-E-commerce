@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { SearchOverlay } from "@/components/search/SearchOverlay";
 import { PageTracker } from "@/components/layout/PageTracker";
+import { FlyingCartItem } from "@/components/cart/FlyingCartItem";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -50,6 +51,7 @@ export default function RootLayout({
           <Footer />
           <CartDrawer />
           <SearchOverlay />
+          <FlyingCartItem />
         </ConvexClientProvider>
       </body>
     </html>

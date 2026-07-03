@@ -153,6 +153,7 @@ export function Navbar() {
               <button
                 onClick={openCart}
                 aria-label={`Cart — ${count} item${count !== 1 ? "s" : ""}`}
+                data-cart-icon
                 className="relative text-bone/70 hover:text-gold transition-colors duration-200 cursor-pointer"
               >
                 <ShoppingBag size={18} />
@@ -199,6 +200,7 @@ export function Navbar() {
               <button
                 onClick={openCart}
                 aria-label={`Cart — ${count} item${count !== 1 ? "s" : ""}`}
+                data-cart-icon
                 className="relative text-bone/70 hover:text-gold transition-colors cursor-pointer"
               >
                 <ShoppingBag size={18} />

@@ -6,6 +6,7 @@ import { ShoppingBag, Check, Zap } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useRouter } from "next/navigation";
 import { cn, formatPrice } from "@/lib/utils";
+import React from "react";
 
 type Variant = {
   _id?: string;
@@ -25,7 +26,7 @@ type Props = {
 
 export function AddToBag({ productId, productName, brandName, variants, image = "" }: Props) {
   const router = useRouter();
-  const { addItem, openCart } = useCartStore();
+  const { addItem, triggerFly } = useCartStore();
   const [selectedId, setSelectedId] = useState<string>(
     (variants[0]?.id ?? variants[0]?._id) ?? ""
   );
@@ -36,7 +37,7 @@ export function AddToBag({ productId, productName, brandName, variants, image = 
     (v) => (v.id ?? v._id) === selectedId
   ) ?? variants[0];
 
-  const handleAdd = () => {
+  const handleAdd = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!selectedVariant) return;
     const vid = selectedVariant.id ?? selectedVariant._id ?? "";
     addItem({
@@ -50,11 +51,15 @@ export function AddToBag({ productId, productName, brandName, variants, image = 
       quantity: 1,
       image,
     });
+    // Fire the flying animation from button centre
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    triggerFly({
+      fromX: rect.left + rect.width / 2,
+      fromY: rect.top + rect.height / 2,
+      image: image || undefined,
+    });
     setAdded(true);
-    setTimeout(() => {
-      setAdded(false);
-      openCart();
-    }, 1200);
+    setTimeout(() => setAdded(false), 1200);
   };
 
   const handleBuyNow = () => {
@@ -109,7 +114,7 @@ export function AddToBag({ productId, productName, brandName, variants, image = 
       <div className="flex flex-col sm:flex-row gap-3">
         <button
           ref={btnRef}
-          onClick={handleAdd}
+          onClick={(e) => handleAdd(e)}
           disabled={added}
           className={cn(
             "relative flex-1 py-4 rounded-full flex items-center justify-center gap-3",
