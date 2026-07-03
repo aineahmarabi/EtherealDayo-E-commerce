@@ -236,75 +236,91 @@ function WorldColumn({
             className="group relative flex-1 border-t border-x cursor-pointer overflow-hidden"
             style={{
               borderColor: `${world.accent}30`,
-              background: `linear-gradient(180deg, ${world.accent}0c 0%, rgba(10,4,20,0.93) 65%)`,
             }}
           >
-            {/* Hover accent wash */}
-            <motion.div
-              className="absolute inset-0 opacity-0 group-hover:opacity-[0.12] transition-opacity duration-700 pointer-events-none"
-              style={{ backgroundColor: world.accent }}
-            />
-
-            {/* Rounded top corners only */}
-            <div className="absolute top-0 inset-x-0 h-4 rounded-t-2xl" style={{ borderRadius: "16px 16px 0 0", backgroundColor: "transparent" }} />
-
-            {/* Content */}
-            <div className="relative h-full flex flex-col items-center py-8 px-3">
-              {/* Tag */}
-              {world.tag && (
-                <span
-                  className="text-[9px] tracking-[0.35em] uppercase font-body mb-auto"
-                  style={{ color: world.accent }}
+            {/* ── Background: product image OR dark gradient ── */}
+            <AnimatePresence mode="wait">
+              {productInfo && productInfo.image ? (
+                <motion.div
+                  key={productInfo.image}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.7, ease: "easeInOut" }}
+                  className="absolute inset-0 overflow-hidden"
                 >
-                  {world.tag}
-                </span>
+                  <Image
+                    src={productInfo.image}
+                    alt={productInfo.name}
+                    fill
+                    className="object-cover object-top transition-transform duration-700 ease-in-out group-hover:scale-110"
+                    sizes="(max-width: 768px) 20vw, 20vw"
+                  />
+                  {/* dark overlay so text stays readable */}
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background: `linear-gradient(180deg, rgba(10,4,20,0.15) 0%, rgba(10,4,20,0.05) 40%, rgba(10,4,20,0.75) 75%, rgba(10,4,20,0.96) 100%)`,
+                    }}
+                  />
+                  {/* subtle accent tint */}
+                  <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-[0.08] transition-opacity duration-700"
+                    style={{ backgroundColor: world.accent }}
+                  />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="dark-bg"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0"
+                  style={{
+                    background: `linear-gradient(180deg, ${world.accent}0c 0%, rgba(10,4,20,0.93) 65%)`,
+                  }}
+                >
+                  {/* Floating SVG bottle placeholder — centred */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <motion.div
+                      animate={{ y: [0, -6, 0] }}
+                      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                      className="transition-transform duration-700 ease-in-out group-hover:scale-110"
+                    >
+                      <BottleSVG accent={world.accent} className="w-20 h-32 md:w-24 md:h-36 opacity-70" />
+                    </motion.div>
+                  </div>
+                  <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-[0.1] transition-opacity duration-700"
+                    style={{ backgroundColor: world.accent }}
+                  />
+                </motion.div>
               )}
+            </AnimatePresence>
 
-              {/* Bottle with dynamic product image support */}
-              <div className="flex items-center justify-center flex-1 py-6 relative w-full h-full min-h-[144px]">
-                <AnimatePresence mode="wait">
-                  {productInfo && productInfo.image ? (
-                    <motion.div
-                      key={productInfo.image}
-                      initial={{ opacity: 0, scale: 0.92, y: 5 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.92, y: -5 }}
-                      transition={{ duration: 0.55, ease: "easeInOut" }}
-                      className="relative w-24 h-32 md:w-28 md:h-36 aspect-[3/4]"
-                    >
-                      <Image
-                        src={productInfo.image}
-                        alt={productInfo.name}
-                        fill
-                        className="object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.6)] group-hover:scale-105 transition-transform duration-700"
-                        sizes="(max-width: 768px) 96px, 112px"
-                      />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="svg-placeholder"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1, y: [0, -5, 0] }}
-                      exit={{ opacity: 0 }}
-                      transition={{
-                        opacity: { duration: 0.55 },
-                        y: { duration: 4 + Math.random(), repeat: Infinity, ease: "easeInOut" }
-                      }}
-                    >
-                      <BottleSVG accent={world.accent} className="w-20 h-32 md:w-24 md:h-36" />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+            {/* ── Foreground content (z-10) ── */}
+            <div className="relative z-10 h-full flex flex-col justify-between py-5 px-3">
+              {/* Tag top */}
+              <div>
+                {world.tag && (
+                  <span
+                    className="text-[9px] tracking-[0.35em] uppercase font-body"
+                    style={{ color: world.accent }}
+                  >
+                    {world.tag}
+                  </span>
+                )}
               </div>
 
-              {/* World label at bottom */}
-              <div className="flex flex-col items-center gap-1.5 mt-auto">
-                <span className="font-display text-base text-bone tracking-tight text-center">
+              {/* Label bottom */}
+              <div className="flex flex-col gap-1.5">
+                <span className="font-display text-base text-bone tracking-tight text-center block">
                   {world.label}
                 </span>
                 <span
-                  className="block w-8 h-px"
-                  style={{ backgroundColor: world.accent, opacity: 0.5 }}
+                  className="block w-8 h-px mx-auto"
+                  style={{ backgroundColor: world.accent, opacity: 0.6 }}
                 />
               </div>
             </div>
