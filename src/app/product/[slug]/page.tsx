@@ -79,13 +79,13 @@ function ScentPyramid({
 function BottleDisplay({ image, name }: { image?: string; name: string }) {
   if (image) {
     return (
-      <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-noir">
-        <Image src={image} alt={name} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
+      <div className="relative w-full aspect-[3/4] max-w-[300px] mx-auto rounded-2xl overflow-hidden bg-noir border border-gold/10">
+        <Image src={image} alt={name} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 300px" />
       </div>
     );
   }
   return (
-    <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-gradient-to-b from-bordeaux-deep/30 to-noir flex items-center justify-center border border-gold/10">
+    <div className="relative w-full aspect-[3/4] max-w-[300px] mx-auto rounded-2xl overflow-hidden bg-gradient-to-b from-bordeaux-deep/30 to-noir flex items-center justify-center border border-gold/10">
       {/* Ambient glow */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full bg-gold/5 blur-3xl" />
       {/* Bottle SVG placeholder */}
@@ -124,7 +124,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   if (data === undefined) {
     return (
       <div className="min-h-dvh bg-ink pt-32 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <ProductHeroSkeleton />
         </div>
       </div>
@@ -160,7 +160,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   return (
     <div className="min-h-dvh bg-ink">
       {/* Back link */}
-      <div className="pt-24 pb-0 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div className="pt-24 pb-0 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
         <Link
           href="/catalog"
           className="inline-flex items-center gap-2 text-sm text-muted-text hover:text-bone transition-colors font-body mt-4"
@@ -172,22 +172,22 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
       {/* Product hero */}
       <section className="py-10 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid lg:grid-cols-[1fr_1.3fr] gap-12 lg:gap-16 items-start">
             {/* Left: bottle + thumbnails */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, ease }}
-              className="flex flex-col gap-4"
+              className="w-full max-w-[300px] mx-auto flex flex-col gap-4"
             >
               <BottleDisplay image={mainImage} name={product.name} />
               {/* Thumbnail strip */}
               {product.images.length > 1 && (
-                <div className="flex gap-3">
+                <div className="flex gap-2.5 justify-center">
                   {product.images.slice(0, 4).map((img: string, i: number) => (
-                    <div key={i} className="w-20 h-20 rounded-lg overflow-hidden border border-gold/20 bg-bordeaux-deep/30 flex-shrink-0">
-                      <Image src={img} alt={`${product.name} view ${i + 1}`} width={80} height={80} className="w-full h-full object-cover" />
+                    <div key={i} className="w-14 h-14 rounded-lg overflow-hidden border border-gold/15 bg-bordeaux-deep/30 flex-shrink-0 cursor-pointer hover:border-gold/60 transition-colors">
+                      <Image src={img} alt={`${product.name} view ${i + 1}`} width={56} height={56} className="w-full h-full object-cover" />
                     </div>
                   ))}
                 </div>
@@ -199,19 +199,17 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, ease }}
-              className="flex flex-col gap-7 pt-2"
+              className="flex flex-col gap-6 pt-2"
             >
               {/* Brand + name */}
               <div className="flex flex-col gap-2">
-                <span
-                  className="text-xs tracking-[0.3em] uppercase text-gold font-body"
-                >
+                <span className="text-xs tracking-[0.3em] uppercase text-gold font-body">
                   {product.brandName}
                 </span>
-                <h1 className="font-display text-3xl md:text-5xl text-bone tracking-tight leading-tight">
+                <h1 className="font-display text-3xl md:text-4xl text-bone tracking-tight leading-tight">
                   {product.name}
                 </h1>
-                <p className="text-sm text-muted-text font-body">
+                <p className="text-xs text-muted-text font-body uppercase tracking-wider">
                   {product.family} · {product.perfumer} · {product.year}
                 </p>
               </div>
@@ -231,36 +229,40 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               {/* Divider */}
               <div className="hairline" />
 
-              {/* Scent meters */}
-              <div className="flex flex-col gap-4">
-                <p className="text-[10px] tracking-[0.3em] uppercase text-gold font-body">Performance</p>
-                <ScentMeter label="Sillage" value={product.sillage} />
-                <ScentMeter label="Longevity" value={product.longevity} />
-                <ScentMeter label="Intensity" value={product.intensity} />
+              {/* The Story / Description */}
+              <div className="flex flex-col gap-2">
+                <span className="text-[10px] tracking-[0.2em] uppercase text-gold font-body font-semibold">The Story</span>
+                <p className="text-sm text-muted-text font-body leading-relaxed">
+                  {product.story}
+                </p>
+              </div>
+
+              {/* Divider */}
+              <div className="hairline" />
+
+              {/* Scent Profile & Performance Side by Side */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 items-start">
+                {/* Scent Profile notes */}
+                <div className="flex flex-col gap-3">
+                  <span className="text-[10px] tracking-[0.2em] uppercase text-gold font-body font-semibold">Scent Profile</span>
+                  <ScentPyramid
+                    top={product.notesTop}
+                    heart={product.notesHeart}
+                    base={product.notesBase}
+                  />
+                </div>
+
+                {/* Scent meters */}
+                <div className="flex flex-col gap-3">
+                  <span className="text-[10px] tracking-[0.2em] uppercase text-gold font-body font-semibold">Performance</span>
+                  <div className="flex flex-col gap-3">
+                    <ScentMeter label="Sillage" value={product.sillage} />
+                    <ScentMeter label="Longevity" value={product.longevity} />
+                    <ScentMeter label="Intensity" value={product.intensity} />
+                  </div>
+                </div>
               </div>
             </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Scent pyramid */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 border-t border-gold/5">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12">
-            <div>
-              <h2 className="font-display text-2xl text-bone mb-8 tracking-tight">Scent Profile</h2>
-              <ScentPyramid
-                top={product.notesTop}
-                heart={product.notesHeart}
-                base={product.notesBase}
-              />
-            </div>
-            <div>
-              <h2 className="font-display text-2xl text-bone mb-6 tracking-tight">The Story</h2>
-              <p className="text-muted-text font-body leading-relaxed text-base">
-                {product.story}
-              </p>
-            </div>
           </div>
         </div>
       </section>
@@ -268,7 +270,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
       {/* Related */}
       {(related === undefined || (relatedProducts && relatedProducts.length > 0)) && (
         <section className="py-16 px-4 sm:px-6 lg:px-8 border-t border-gold/5">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             <h2 className="font-display text-2xl text-bone mb-10 tracking-tight">You May Also Like</h2>
             {relatedProducts === undefined ? (
               <CollectionGridSkeleton count={4} />

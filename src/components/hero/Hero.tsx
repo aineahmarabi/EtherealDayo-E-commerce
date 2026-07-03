@@ -2,8 +2,12 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { WORLDS } from "@/lib/types";
+import { useState, useEffect } from "react";
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
+import Image from "next/image";
 
 const ParticleCloud = dynamic(
   () => import("./ParticleCloud").then((m) => ({ default: m.ParticleCloud })),
@@ -15,6 +19,44 @@ const ease = [0.2, 0.8, 0.2, 1] as const;
 /* Navbar is 64px (h-16). Cards fill from the very bottom of the navbar to the bottom of the viewport. */
 
 export function Hero() {
+  const activeProducts = useQuery(api.products.listActive);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveIndex((prev) => prev + 1);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const getProductForWorld = (worldId: string) => {
+    if (!activeProducts || activeProducts.length === 0) return null;
+    let filtered = [];
+    switch (worldId) {
+      case "her":
+        filtered = activeProducts.filter((p) => p.audience === "her" || p.audience === "unisex");
+        break;
+      case "him":
+        filtered = activeProducts.filter((p) => p.audience === "him" || p.audience === "unisex");
+        break;
+      case "bestsellers":
+        filtered = activeProducts.filter((p) => p.isBestseller);
+        break;
+      case "new-arrivals":
+        filtered = [...activeProducts].sort((a, b) => (b.publishedAt || 0) - (a.publishedAt || 0)).slice(0, 8);
+        break;
+      default:
+        filtered = [];
+    }
+
+    if (filtered.length === 0) return null;
+    const prod = filtered[activeIndex % filtered.length];
+    return {
+      image: prod.images?.[0] || "",
+      name: prod.name,
+    };
+  };
+
   return (
     <section
       className="relative h-dvh w-full overflow-hidden"
@@ -41,15 +83,15 @@ export function Hero() {
         style={{ top: "64px" }} /* exactly below navbar */
       >
         {/* Outer left — For Her */}
-        <WorldColumn world={WORLDS[0]} flex={1} pyramidOffset="10%" delay={0.15} />
+        <WorldColumn world={WORLDS[0]} flex={1} pyramidOffset="10%" delay={0.15} productInfo={getProductForWorld(WORLDS[0].id)} />
         {/* Inner left — For Him */}
-        <WorldColumn world={WORLDS[1]} flex={1.1} pyramidOffset="5%" delay={0.2} />
+        <WorldColumn world={WORLDS[1]} flex={1.1} pyramidOffset="5%" delay={0.2} productInfo={getProductForWorld(WORLDS[1].id)} />
         {/* Center — Brand Anchor */}
         <BrandColumn />
         {/* Inner right — Bestsellers */}
-        <WorldColumn world={WORLDS[2]} flex={1.1} pyramidOffset="5%" delay={0.2} />
+        <WorldColumn world={WORLDS[2]} flex={1.1} pyramidOffset="5%" delay={0.2} productInfo={getProductForWorld(WORLDS[2].id)} />
         {/* Outer right — New Arrivals */}
-        <WorldColumn world={WORLDS[3]} flex={1} pyramidOffset="10%" delay={0.15} />
+        <WorldColumn world={WORLDS[3]} flex={1} pyramidOffset="10%" delay={0.15} productInfo={getProductForWorld(WORLDS[3].id)} />
       </div>
 
       {/* ============================================================
@@ -78,43 +120,75 @@ export function Hero() {
 
         {/* 2×2 grid — fills remaining height */}
         <div className="grid grid-cols-2 gap-3 flex-1 pb-3">
-          {WORLDS.map((world, i) => (
-            <motion.div
-              key={world.id}
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.25 + i * 0.08, ease }}
-              className="h-full min-h-0"
-            >
-              <Link href={world.href} aria-label={`Explore ${world.label}`} className="block h-full">
-                <div
-                  className="relative h-full rounded-2xl border overflow-hidden flex flex-col"
-                  style={{
-                    borderColor: `${world.accent}35`,
-                    background: `linear-gradient(180deg, ${world.accent}0a 0%, rgba(20,10,40,0.95) 100%)`,
-                  }}
-                >
-                  {/* Accent tag */}
-                  {world.tag && (
-                    <div className="px-3 pt-3">
-                      <span className="text-[8px] tracking-[0.3em] uppercase font-body" style={{ color: world.accent }}>
-                        {world.tag}
-                      </span>
+          {WORLDS.map((world, i) => {
+            const productInfo = getProductForWorld(world.id);
+            return (
+              <motion.div
+                key={world.id}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.25 + i * 0.08, ease }}
+                className="h-full min-h-0"
+              >
+                <Link href={world.href} aria-label={`Explore ${world.label}`} className="block h-full">
+                  <div
+                    className="relative h-full rounded-2xl border overflow-hidden flex flex-col"
+                    style={{
+                      borderColor: `${world.accent}35`,
+                      background: `linear-gradient(180deg, ${world.accent}0a 0%, rgba(20,10,40,0.95) 100%)`,
+                    }}
+                  >
+                    {/* Accent tag */}
+                    {world.tag && (
+                      <div className="px-3 pt-3">
+                        <span className="text-[8px] tracking-[0.3em] uppercase font-body" style={{ color: world.accent }}>
+                          {world.tag}
+                        </span>
+                      </div>
+                    )}
+                    {/* Bottle centered with dynamic image */}
+                    <div className="flex-1 flex items-center justify-center p-3 relative w-full h-full min-h-[96px]">
+                      <AnimatePresence mode="wait">
+                        {productInfo && productInfo.image ? (
+                          <motion.div
+                            key={productInfo.image}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            transition={{ duration: 0.55 }}
+                            className="relative w-16 h-20 aspect-[3/4]"
+                          >
+                            <Image
+                              src={productInfo.image}
+                              alt={productInfo.name}
+                              fill
+                              className="object-contain filter drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)]"
+                              sizes="64px"
+                            />
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="svg-placeholder"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.55 }}
+                          >
+                            <BottleSVG accent={world.accent} className="w-12 h-20" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
-                  )}
-                  {/* Bottle centered */}
-                  <div className="flex-1 flex items-center justify-center">
-                    <BottleSVG accent={world.accent} className="w-12 h-20" />
+                    {/* Label bar */}
+                    <div className="px-3 pb-4 flex flex-col gap-0.5">
+                      <span className="font-display text-sm text-bone leading-tight">{world.label}</span>
+                      <span className="w-5 h-px block" style={{ backgroundColor: world.accent, opacity: 0.5 }} />
+                    </div>
                   </div>
-                  {/* Label bar */}
-                  <div className="px-3 pb-4 flex flex-col gap-0.5">
-                    <span className="font-display text-sm text-bone leading-tight">{world.label}</span>
-                    <span className="w-5 h-px block" style={{ backgroundColor: world.accent, opacity: 0.5 }} />
-                  </div>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
+                </Link>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
 
@@ -139,11 +213,13 @@ function WorldColumn({
   flex,
   pyramidOffset,
   delay,
+  productInfo,
 }: {
   world: (typeof WORLDS)[number];
   flex: number;
   pyramidOffset: string;
   delay: number;
+  productInfo: { image: string; name: string } | null;
 }) {
   return (
     <div style={{ flex, display: "flex", flexDirection: "column" }}>
@@ -184,14 +260,41 @@ function WorldColumn({
                 </span>
               )}
 
-              {/* Bottle */}
-              <div className="flex items-center justify-center flex-1 py-6">
-                <motion.div
-                  animate={{ y: [0, -5, 0] }}
-                  transition={{ duration: 4 + Math.random(), repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <BottleSVG accent={world.accent} className="w-20 h-32 md:w-24 md:h-36" />
-                </motion.div>
+              {/* Bottle with dynamic product image support */}
+              <div className="flex items-center justify-center flex-1 py-6 relative w-full h-full min-h-[144px]">
+                <AnimatePresence mode="wait">
+                  {productInfo && productInfo.image ? (
+                    <motion.div
+                      key={productInfo.image}
+                      initial={{ opacity: 0, scale: 0.92, y: 5 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.92, y: -5 }}
+                      transition={{ duration: 0.55, ease: "easeInOut" }}
+                      className="relative w-24 h-32 md:w-28 md:h-36 aspect-[3/4]"
+                    >
+                      <Image
+                        src={productInfo.image}
+                        alt={productInfo.name}
+                        fill
+                        className="object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.6)] group-hover:scale-105 transition-transform duration-700"
+                        sizes="(max-width: 768px) 96px, 112px"
+                      />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="svg-placeholder"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1, y: [0, -5, 0] }}
+                      exit={{ opacity: 0 }}
+                      transition={{
+                        opacity: { duration: 0.55 },
+                        y: { duration: 4 + Math.random(), repeat: Infinity, ease: "easeInOut" }
+                      }}
+                    >
+                      <BottleSVG accent={world.accent} className="w-20 h-32 md:w-24 md:h-36" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* World label at bottom */}
