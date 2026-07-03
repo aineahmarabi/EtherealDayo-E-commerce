@@ -65,20 +65,32 @@ type ShippingRate = { _id: string; name: string; price: number; isActive: boolea
 
 const PICKUP_OPTION: ShippingRate = { _id: "pickup", name: "Pick Up — Free", price: 0, isActive: true };
 
+const LOCAL_SHIPPING_RATES: ShippingRate[] = [
+  { _id: "pickup", name: "Pick Up from our Shop", price: 0, isActive: true },
+  { _id: "cbd", name: "Delivery within CBD", price: 100, isActive: true },
+  { _id: "supermetro", name: "Thika, Kikuyu, Ruiru, Juja, Syokimau, Ngong, Kitengela etc via Super Metro, Rembo sacco etc", price: 200, isActive: true },
+  { _id: "nairobi-hospital", name: "Upperhill, Valley Road, Community, Hurlingham, Nairobi Hospital, Pangani, Ngara, KNH, Oijo Road etc", price: 300, isActive: true },
+  { _id: "westlands", name: "Riverside, Westlands, ABC, Kilimani, Kileleshwa, Westgate, Parklands, MP Shah, Aga Khan, Oshwal", price: 350, isActive: true },
+  { _id: "bellevue", name: "South B, South C, Mbagathi, Madaraka, Lang'ata, Nairobi West, Bellevue, Nextgen Mall, Carnivore, Panari", price: 350, isActive: true },
+  { _id: "lavington", name: "Junction Mall, Lavington, Kibra, Dagoreti Corner, Kawangware, Wanyee, Kabiria, Riruta, Naivasha Road Areas", price: 400, isActive: true },
+  { _id: "garden-city", name: "Roasters, Mountain Mall, Garden City, TRM, USIU, Ngumba", price: 400, isActive: true },
+  { _id: "umoja", name: "Shauri Moyo, Huruma, Kariobangi, Donholm, Umoja, Kayole, Buruburu, Komarock, Dandora, Saika", price: 400, isActive: true },
+  { _id: "courier", name: "Outside Nairobi via courier — 2NK, Northrift, Easycoach, Ena Coach", price: 450, isActive: true },
+  { _id: "gigiri", name: "Gigiri, Village Market, Runda, Ruaka", price: 500, isActive: true },
+  { _id: "loresho", name: "Kangemi, Loresho, Mountain View, Spring Valley, Peponi Road, Lower Kabete Areas", price: 500, isActive: true },
+  { _id: "muthaiga", name: "Muthaiga North, Ridgeways, Fourways, Thindigua Areas", price: 500, isActive: true },
+  { _id: "zimmerman", name: "Zimmerman, Thome, Githurai 44/45, Kahawa West / Wendani / Sukari", price: 500, isActive: true },
+  { _id: "karen", name: "Galleria Mall, Karen Area", price: 700, isActive: true },
+  { _id: "rongai", name: "Rongai, Kikuyu, Kiambu, Ngong Town, Tatu City", price: 800, isActive: true },
+];
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, total, clearCart } = useCartStore();
   const cartTotal = total();
   const createOrder = useMutation(api.orders.create);
 
-  const shippingRatesRaw = useQuery(api.shipping.listActive);
-  const shippingRates: ShippingRate[] = useMemo(() => {
-    const base: ShippingRate[] = [PICKUP_OPTION];
-    if (shippingRatesRaw) {
-      shippingRatesRaw.forEach((r) => base.push({ _id: r._id, name: r.name, price: r.price, isActive: r.isActive }));
-    }
-    return base;
-  }, [shippingRatesRaw]);
+  const shippingRates = LOCAL_SHIPPING_RATES;
 
   const [step, setStep] = useState<Step>("contact");
   const [placing, setPlacing] = useState(false);
