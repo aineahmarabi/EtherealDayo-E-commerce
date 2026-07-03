@@ -213,23 +213,19 @@ export default function CheckoutPage() {
                 {/* Shipping method selection */}
                 <div className="flex flex-col gap-3">
                   <p className="text-xs tracking-widest uppercase text-muted-text font-body">Choose your delivery option</p>
-                  {shippingRatesRaw === undefined ? (
-                    <div className="h-20 bg-white/5 rounded-xl animate-pulse" />
-                  ) : (
-                    shippingRates.map((rate) => (
-                      <label key={rate._id} className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${selectedShippingId === rate._id ? "border-gold bg-bordeaux-deep/20" : "border-gold/15 hover:border-gold/30"}`}>
-                        <input type="radio" name="shipping" value={rate._id} checked={selectedShippingId === rate._id}
-                          onChange={() => { setSelectedShippingId(rate._id); if (rate._id === "pickup") setAddress({ line1: "", line2: "", city: "", state: "", zip: "", country: "Kenya" }); }}
-                          className="accent-gold w-4 h-4" />
-                        <div className="flex-1">
-                          <p className="text-sm font-body text-bone">{rate.name}</p>
-                        </div>
-                        <span className="text-sm text-gold font-body font-medium">
-                          {rate.price === 0 ? "Free" : formatKES(rate.price)}
-                        </span>
-                      </label>
-                    ))
-                  )}
+                  {shippingRates.map((rate) => (
+                    <label key={rate._id} className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${selectedShippingId === rate._id ? "border-gold bg-bordeaux-deep/20" : "border-gold/15 hover:border-gold/30"}`}>
+                      <input type="radio" name="shipping" value={rate._id} checked={selectedShippingId === rate._id}
+                        onChange={() => { setSelectedShippingId(rate._id); if (rate._id === "pickup") setAddress({ line1: "", line2: "", city: "", state: "", zip: "", country: "Kenya" }); }}
+                        className="accent-gold w-4 h-4" />
+                      <div className="flex-1">
+                        <p className="text-sm font-body text-bone">{rate.name}</p>
+                      </div>
+                      <span className="text-sm text-gold font-body font-medium">
+                        {rate.price === 0 ? "Free" : formatKES(rate.price)}
+                      </span>
+                    </label>
+                  ))}
                 </div>
 
                 {/* Address — only show if not pickup */}
