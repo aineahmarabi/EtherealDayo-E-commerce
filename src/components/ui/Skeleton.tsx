@@ -4,9 +4,9 @@ export function Skeleton({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-md bg-bordeaux-deep/30",
+        "relative overflow-hidden rounded-md bg-white/[0.03]",
         "before:absolute before:inset-0 before:-translate-x-full",
-        "before:bg-gradient-to-r before:from-transparent before:via-gold/10 before:to-transparent",
+        "before:bg-gradient-to-r before:from-transparent before:via-white/5 before:to-transparent",
         "before:animate-[shimmer_2s_infinite]",
         className
       )}

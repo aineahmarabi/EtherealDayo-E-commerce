@@ -63,21 +63,21 @@ export function ProductCard({ product }: { product: ProductLike }) {
         <motion.div
           whileHover={{ y: -4 }}
           transition={{ duration: 0.4, ease }}
-          className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-gradient-to-b from-bordeaux-deep/40 to-noir flex items-center justify-center"
+          className="relative aspect-[4/5] w-full flex items-center justify-center"
         >
           {image ? (
             <Image
               src={image}
               alt={product.name}
               fill
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
+              className="object-contain transition-transform duration-700 group-hover:scale-105"
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
           ) : (
             <BottlePlaceholderCard />
           )}
           {/* Hover veil */}
-          <div className="absolute inset-0 bg-bordeaux-deep/0 group-hover:bg-bordeaux-deep/40 transition-colors duration-500" />
+          <div className="absolute inset-0 bg-transparent group-hover:bg-white/[0.02] rounded-xl transition-colors duration-500" />
           
           {/* Quick Add Button */}
           {product.variants && product.variants.length > 0 && (
