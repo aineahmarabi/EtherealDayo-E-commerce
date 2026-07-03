@@ -3,13 +3,23 @@ import { v } from "convex/values";
 import { Id } from "./_generated/dataModel";
 
 async function withImageUrls(ctx: QueryCtx, product: any) {
+  const siteUrl = process.env.CONVEX_SITE_URL || "";
   const images = await Promise.all(product.images.map(async (img: string) => {
+    if (!img) return "";
     if (img.includes("/api/storage/")) {
       const id = img.split("/api/storage/")[1].split("?")[0];
-      return (await ctx.storage.getUrl(id as Id<"_storage">)) ?? img;
+      try {
+        return (await ctx.storage.getUrl(id as Id<"_storage">)) ?? img;
+      } catch {
+        return img;
+      }
     }
     if (!img.includes("/") && img.trim() !== "") {
-      return (await ctx.storage.getUrl(img as Id<"_storage">)) ?? img;
+      try {
+        const url = await ctx.storage.getUrl(img as Id<"_storage">);
+        if (url) return url;
+      } catch {}
+      return `${siteUrl}/api/storage/${img}`;
     }
     return img;
   }));
