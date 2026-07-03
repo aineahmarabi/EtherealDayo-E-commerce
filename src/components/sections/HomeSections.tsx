@@ -122,13 +122,13 @@ function BrandsRow() {
                   {(() => {
                     const img = getBrandImage(brand.slug);
                     return img ? (
-                      <div className="w-16 h-16 rounded-full overflow-hidden border border-gold/20 group-hover:border-gold/50 transition-colors flex items-center justify-center bg-white/5">
+                      <div className="w-16 h-16 rounded-full overflow-hidden border border-gold/20 group-hover:border-gold/50 transition-colors flex items-center justify-center bg-white">
                         <Image
                           src={img}
                           alt={brand.name}
-                          width={64}
-                          height={64}
-                          className="object-cover w-full h-full"
+                          width={48}
+                          height={48}
+                          className="object-contain w-10 h-10"
                         />
                       </div>
                     ) : (

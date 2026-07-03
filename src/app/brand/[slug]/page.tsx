@@ -70,13 +70,13 @@ export default function BrandPage({ params }: { params: Promise<{ slug: string }
                 <div className="flex items-center gap-4">
                   {/* Brand logo circle */}
                   {heroImage ? (
-                    <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gold/60 shadow-lg shadow-gold/10">
+                    <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-gold/60 shadow-lg shadow-gold/10 bg-white flex items-center justify-center">
                       <Image
                         src={heroImage}
                         alt={brand.name}
-                        width={56}
-                        height={56}
-                        className="object-cover w-full h-full"
+                        width={42}
+                        height={42}
+                        className="object-contain w-[42px] h-[42px]"
                       />
                     </div>
                   ) : (
