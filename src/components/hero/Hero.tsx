@@ -354,7 +354,8 @@ export function Hero() {
           scrollXRef.current = liveScrollRef.current;
         }
         const scrollX    = scrollXRef.current;
-        const mobileScale = Math.min(1.0, Math.min(W, H) * 0.44 / RINGS[1].r);
+        // Increased scale by 25% to make planets and images much larger/clearer on mobile
+        const mobileScale = Math.min(1.2, Math.min(W, H) * 0.55 / RINGS[1].r);
         const curIdx     = Math.round(scrollX / W);
 
         for (let sid = 0; sid < 4; sid++) {
@@ -453,21 +454,38 @@ export function Hero() {
   }, []);
 
   /* ── Mobile touch ───────────────────────────────────────────────── */
+  const dragStartYRef = useRef(0);
+  const isVerticalScrollRef = useRef(false);
+
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const W = window.innerWidth;
     if (W >= MOBILE_BP) return;
     isDraggingRef.current = true;
+    isVerticalScrollRef.current = false;
     dragStartXRef.current = e.touches[0].clientX;
+    dragStartYRef.current = e.touches[0].clientY;
     liveScrollRef.current = scrollXRef.current;
   }, []);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     const W = window.innerWidth;
     const tx = e.touches[0].clientX;
-    mouseRef.current = { x: tx, y: e.touches[0].clientY };
+    const ty = e.touches[0].clientY;
+    mouseRef.current = { x: tx, y: ty };
+    
     if (W < MOBILE_BP && isDraggingRef.current) {
-      const delta = dragStartXRef.current - tx;
-      liveScrollRef.current = targetScrollRef.current + delta;
+      const dx = Math.abs(tx - dragStartXRef.current);
+      const dy = Math.abs(ty - dragStartYRef.current);
+      
+      // If moving mostly vertically, let the browser scroll the page
+      if (dy > dx && dy > 10) {
+        isVerticalScrollRef.current = true;
+      }
+      
+      if (!isVerticalScrollRef.current) {
+        const delta = dragStartXRef.current - tx;
+        liveScrollRef.current = targetScrollRef.current + delta;
+      }
     }
   }, []);
 
@@ -475,15 +493,27 @@ export function Hero() {
     const W = window.innerWidth;
     if (W < MOBILE_BP) {
       isDraggingRef.current = false;
+      if (isVerticalScrollRef.current) return; // Was a vertical scroll, ignore swipe
+
       const endX     = e.changedTouches[0]?.clientX ?? dragStartXRef.current;
       const rawDelta = dragStartXRef.current - endX;
-      setMobileIdx((prev) => {
-        const next = Math.max(0, Math.min(3,
-          rawDelta > W * 0.22 ? prev + 1 : rawDelta < -W * 0.22 ? prev - 1 : prev
-        ));
-        targetScrollRef.current = next * W;
-        return next;
-      });
+      
+      // If it's a tap (barely moved), try to navigate
+      if (Math.abs(rawDelta) < 10) {
+        const hovPlanet = hoveredPlanetRef.current;
+        if (hovPlanet?.product.slug) {
+          routerRef.current.push(`/product/${hovPlanet.product.slug}`);
+        }
+      } else {
+        // Handle swipe pagination
+        setMobileIdx((prev) => {
+          const next = Math.max(0, Math.min(3,
+            rawDelta > W * 0.15 ? prev + 1 : rawDelta < -W * 0.15 ? prev - 1 : prev
+          ));
+          targetScrollRef.current = next * W;
+          return next;
+        });
+      }
     } else {
       const hovPlanet = hoveredPlanetRef.current;
       const hovSys    = hoveredSysRef.current;
@@ -505,7 +535,8 @@ export function Hero() {
 
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 z-[2] w-full h-full touch-none"
+        className="absolute inset-0 z-[2] w-full h-full"
+        style={{ touchAction: "pan-y" }}
         onClick={handleClick}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
