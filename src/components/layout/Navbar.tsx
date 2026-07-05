@@ -283,6 +283,7 @@ export function Navbar() {
                 className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-6 py-8 flex flex-col gap-1"
                 style={{ WebkitOverflowScrolling: "touch" } as React.CSSProperties}
               >
+                <MobileNavLink href="/" onClick={() => setMenuOpen(false)}>Home</MobileNavLink>
                 <MobileNavLink href="/for-her" onClick={() => setMenuOpen(false)}>For Her</MobileNavLink>
                 <MobileNavLink href="/for-him" onClick={() => setMenuOpen(false)}>For Him</MobileNavLink>
                 <MobileNavLink href="/bestsellers" onClick={() => setMenuOpen(false)}>Bestsellers</MobileNavLink>
