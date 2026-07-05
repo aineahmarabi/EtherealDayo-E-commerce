@@ -32,6 +32,22 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  /* Lock body scroll while mobile menu is open so the hero canvas
+     doesn't swipe behind the menu sheet.                          */
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+    };
+  }, [menuOpen]);
+
   const handleBrandEnter = () => {
     if (dropTimer.current) clearTimeout(dropTimer.current);
     setBrandDropOpen(true);
@@ -244,8 +260,12 @@ export function Navbar() {
               exit={{ x: "-100%" }}
               transition={{ duration: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
               className="fixed inset-y-0 left-0 z-[70] w-80 bg-noir border-r border-gold/10 flex flex-col lg:hidden"
+              /* Stop touch events from reaching the canvas beneath */
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between px-6 py-5 border-b border-gold/10">
+              <div className="flex items-center justify-between px-6 py-5 border-b border-gold/10 flex-shrink-0">
                 <span className="font-display text-sm tracking-widest uppercase text-bone">
                   ⟡ Ethereal Dayo ⟡
                 </span>
@@ -258,7 +278,11 @@ export function Navbar() {
                 </button>
               </div>
 
-              <nav className="flex-1 px-6 py-8 flex flex-col gap-1">
+              {/* Scrollable nav area — overscroll-contain prevents page scroll leak */}
+              <nav
+                className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-6 py-8 flex flex-col gap-1"
+                style={{ WebkitOverflowScrolling: "touch" } as React.CSSProperties}
+              >
                 <MobileNavLink href="/for-her" onClick={() => setMenuOpen(false)}>For Her</MobileNavLink>
                 <MobileNavLink href="/for-him" onClick={() => setMenuOpen(false)}>For Him</MobileNavLink>
                 <MobileNavLink href="/bestsellers" onClick={() => setMenuOpen(false)}>Bestsellers</MobileNavLink>
@@ -285,7 +309,7 @@ export function Navbar() {
 
                 <div className="hairline my-5" />
 
-                <MobileNavLink href="/contact" onClick={() => setMenuOpen(false)}>Contact & Inquiry</MobileNavLink>
+                <MobileNavLink href="/contact" onClick={() => setMenuOpen(false)}>Contact &amp; Inquiry</MobileNavLink>
               </nav>
             </motion.div>
           </>
