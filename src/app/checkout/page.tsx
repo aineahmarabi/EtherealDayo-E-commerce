@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -94,6 +94,12 @@ export default function CheckoutPage() {
 
   const shippingRates = LOCAL_SHIPPING_RATES;
 
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [step, setStep] = useState<Step>("contact");
   const [placing, setPlacing] = useState(false);
   const [contact, setContact] = useState({ name: "", email: "", phone: "" });
@@ -134,6 +140,8 @@ export default function CheckoutPage() {
     });
     setCouponInput("");
   }
+
+  if (!mounted) return null;
 
   if (items.length === 0) {
     return (
