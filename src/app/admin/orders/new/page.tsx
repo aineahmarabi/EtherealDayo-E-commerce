@@ -80,10 +80,11 @@ function ProductPicker({ onAdd }: { onAdd: (item: Omit<LineItem, "qty">) => void
     setSelectedVariant(null);
   };
 
-  const handleAdd = () => {
-    if (!selectedProduct || !selectedVariant || !allProducts || !allVariants) return;
+  const handleAdd = (forceVariantId?: string) => {
+    const targetVariant = forceVariantId || selectedVariant;
+    if (!selectedProduct || !targetVariant || !allProducts || !allVariants) return;
     const product = allProducts.find(p => p._id === selectedProduct);
-    const variant = allVariants.find(v => v._id === selectedVariant);
+    const variant = allVariants.find(v => v._id === targetVariant);
     if (!product || !variant) return;
     onAdd({
       variantId: variant._id,
@@ -153,11 +154,8 @@ function ProductPicker({ onAdd }: { onAdd: (item: Omit<LineItem, "qty">) => void
             {variantsForProduct.map(v => (
               <button
                 key={v._id}
-                onClick={() => setSelectedVariant(v._id === selectedVariant ? null : v._id)}
-                className={`px-4 py-2 rounded-lg border text-xs font-body transition-all ${selectedVariant === v._id
-                  ? "border-purple-500 bg-purple-900/40 text-purple-200"
-                  : "border-gold/20 text-muted-text hover:border-gold/40 hover:text-bone"
-                  }`}
+                onClick={() => handleAdd(v._id)}
+                className="px-4 py-2 rounded-lg border border-gold/20 text-muted-text hover:border-gold/40 hover:text-bone hover:bg-gold/5 text-xs font-body transition-all"
               >
                 {v.size} {v.concentration} · {formatPrice(v.price)}
                 <span className={`ml-2 text-[9px] ${v.stock <= 5 ? "text-red-400" : "text-green-500"}`}>
@@ -166,13 +164,6 @@ function ProductPicker({ onAdd }: { onAdd: (item: Omit<LineItem, "qty">) => void
               </button>
             ))}
           </div>
-          <button
-            onClick={handleAdd}
-            disabled={!selectedVariant}
-            className="self-start flex items-center gap-2 px-4 py-2 bg-gold text-noir text-xs font-body rounded-full uppercase tracking-widest hover:bg-gold-soft transition-all disabled:opacity-40"
-          >
-            <Plus size={12} /> Add to Order
-          </button>
         </motion.div>
       )}
 
@@ -203,7 +194,6 @@ export default function CreateOrderPage() {
     line1: "", line2: "", city: "", state: "", zip: "", country: "Kenya",
   });
   const [shipping, setShipping] = useState("0");
-  const [taxRate, setTaxRate] = useState("0");
   const [giftMessage, setGiftMessage] = useState("");
   const [addAddress, setAddAddress] = useState(false);
   const [customerQuery, setCustomerQuery] = useState("");
@@ -219,9 +209,8 @@ export default function CreateOrderPage() {
   }, [customers, customerQuery]);
 
   const subtotal = lineItems.reduce((s, i) => s + i.price * i.qty, 0);
-  const tax = subtotal * (Number(taxRate) / 100);
   const shippingCost = Number(shipping);
-  const total = subtotal + tax + shippingCost;
+  const total = subtotal + shippingCost;
 
   const adjustQty = (variantId: string, delta: number) => {
     setLineItems(prev =>
@@ -273,7 +262,7 @@ export default function CreateOrderPage() {
         })),
         subtotal,
         shipping: shippingCost,
-        tax,
+        tax: 0,
         total,
         giftMessage: giftMessage || undefined,
       });
@@ -486,10 +475,6 @@ export default function CreateOrderPage() {
                   <label className="text-[10px] text-muted-text uppercase tracking-widest font-body">Shipping (KES)</label>
                   <input type="number" min="0" value={shipping} onChange={e => setShipping(e.target.value)} className={inputCls + " text-xs py-2"} />
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] text-muted-text uppercase tracking-widest font-body">Tax Rate (%)</label>
-                  <input type="number" min="0" max="100" step="0.01" value={taxRate} onChange={e => setTaxRate(e.target.value)} className={inputCls + " text-xs py-2"} />
-                </div>
               </div>
 
               {/* Totals */}
@@ -499,9 +484,6 @@ export default function CreateOrderPage() {
                 </div>
                 <div className="flex justify-between text-muted-text">
                   <span>Shipping</span><span>{formatPrice(shippingCost)}</span>
-                </div>
-                <div className="flex justify-between text-muted-text">
-                  <span>Tax ({taxRate}%)</span><span>{formatPrice(tax)}</span>
                 </div>
                 <div className="flex justify-between text-bone font-medium text-base border-t border-gold/10 pt-2 mt-1">
                   <span className="font-display">Total</span>
