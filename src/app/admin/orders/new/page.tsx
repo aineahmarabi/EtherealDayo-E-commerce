@@ -73,9 +73,29 @@ function ProductPicker({ onAdd }: { onAdd: (item: Omit<LineItem, "qty">) => void
   }, [allVariants, selectedProduct]);
 
   const handleProductSelect = (product: typeof allProducts extends (infer T)[] | undefined ? T : never) => {
-    if (!product) return;
-    setSelectedProduct((product as { _id: string })._id);
-    setQuery((product as { name: string }).name);
+    if (!product || !allVariants) return;
+    
+    const pId = (product as { _id: string })._id;
+    const pName = (product as { name: string }).name;
+    const vForP = allVariants.filter(v => v.productId === pId);
+    
+    if (vForP.length === 1) {
+      const variant = vForP[0];
+      onAdd({
+        variantId: variant._id,
+        productId: pId,
+        productName: pName,
+        size: variant.size,
+        concentration: variant.concentration,
+        price: variant.price,
+      });
+      setQuery("");
+      setOpen(false);
+      return;
+    }
+
+    setSelectedProduct(pId);
+    setQuery(pName);
     setOpen(false);
     setSelectedVariant(null);
   };
@@ -112,7 +132,7 @@ function ProductPicker({ onAdd }: { onAdd: (item: Omit<LineItem, "qty">) => void
           className={inputCls + " pl-9"}
         />
         {query && (
-          <button onClick={() => { setQuery(""); setSelectedProduct(null); setOpen(false); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-text hover:text-bone">
+          <button type="button" onClick={() => { setQuery(""); setSelectedProduct(null); setOpen(false); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-text hover:text-bone">
             <X size={13} />
           </button>
         )}
@@ -126,6 +146,7 @@ function ProductPicker({ onAdd }: { onAdd: (item: Omit<LineItem, "qty">) => void
           >
             {filtered.map(product => (
               <button
+                type="button"
                 key={product._id}
                 onClick={() => handleProductSelect(product)}
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-purple-900/20 transition-colors text-left border-b border-gold/5 last:border-0"
@@ -153,6 +174,7 @@ function ProductPicker({ onAdd }: { onAdd: (item: Omit<LineItem, "qty">) => void
           <div className="flex flex-wrap gap-2">
             {variantsForProduct.map(v => (
               <button
+                type="button"
                 key={v._id}
                 onClick={() => handleAdd(v._id)}
                 className="px-4 py-2 rounded-lg border border-gold/20 text-muted-text hover:border-gold/40 hover:text-bone hover:bg-gold/5 text-xs font-body transition-all"
