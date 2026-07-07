@@ -57,7 +57,7 @@ function Field({ label, name, type = "text", required, placeholder, value, onCha
         id={name} name={name} type={type} required={required}
         placeholder={placeholder} value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-bordeaux-deep/10 border border-gold/15 rounded-lg px-4 py-3 text-base sm:text-sm text-bone font-body placeholder:text-muted-text focus:border-gold/40 focus:outline-none transition-colors"
+        className="w-full min-w-0 bg-bordeaux-deep/10 border border-gold/15 rounded-lg px-4 py-3 text-base sm:text-sm text-bone font-body placeholder:text-muted-text focus:border-gold/40 focus:outline-none transition-colors"
       />
     </div>
   );
@@ -369,7 +369,7 @@ export default function CheckoutPage() {
                   value={couponInput}
                   onChange={(e) => { setCouponInput(e.target.value.toUpperCase()); setCouponError(""); }}
                   placeholder="Enter code"
-                  className="flex-1 px-3 py-2 text-base sm:text-sm bg-noir border border-gold/15 rounded-lg text-bone font-body placeholder:text-muted-text focus:border-gold/40 focus:outline-none transition-colors"
+                  className="flex-1 min-w-0 px-3 py-2 text-base sm:text-sm bg-noir border border-gold/15 rounded-lg text-bone font-body placeholder:text-muted-text focus:border-gold/40 focus:outline-none transition-colors"
                 />
                 <button onClick={handleApplyCoupon} className="px-4 py-2 bg-gold/20 hover:bg-gold/30 text-gold text-xs font-body rounded-lg transition-colors cursor-pointer whitespace-nowrap">
                   Apply
