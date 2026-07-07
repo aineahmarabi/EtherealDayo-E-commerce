@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Plus, Minus, ShoppingBag } from "lucide-react";
+import { X, Plus, Minus, ShoppingBag, Trash2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -115,24 +115,33 @@ export function CartDrawer() {
                           {item.size} · {item.concentration}
                         </p>
                         <div className="flex items-center justify-between mt-auto pt-2">
-                          {/* Qty stepper */}
-                          <div className="flex items-center gap-2 border border-gold/20 rounded-full px-2 py-1">
+                          {/* Qty stepper & Delete */}
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 border border-gold/20 rounded-full px-2 py-1">
+                              <button
+                                onClick={() => updateQty(item.variantId, item.quantity - 1)}
+                                aria-label="Decrease quantity"
+                                className="w-5 h-5 flex items-center justify-center text-bone/60 hover:text-bone transition-colors cursor-pointer"
+                              >
+                                <Minus size={12} />
+                              </button>
+                              <span className="text-sm text-bone min-w-[1.5ch] text-center font-body">
+                                {item.quantity}
+                              </span>
+                              <button
+                                onClick={() => updateQty(item.variantId, item.quantity + 1)}
+                                aria-label="Increase quantity"
+                                className="w-5 h-5 flex items-center justify-center text-bone/60 hover:text-bone transition-colors cursor-pointer"
+                              >
+                                <Plus size={12} />
+                              </button>
+                            </div>
                             <button
-                              onClick={() => updateQty(item.variantId, item.quantity - 1)}
-                              aria-label="Decrease quantity"
-                              className="w-5 h-5 flex items-center justify-center text-bone/60 hover:text-bone transition-colors cursor-pointer"
+                              onClick={() => removeItem(item.variantId)}
+                              aria-label="Remove item"
+                              className="text-muted-text hover:text-dusty-rose transition-colors cursor-pointer"
                             >
-                              <Minus size={12} />
-                            </button>
-                            <span className="text-sm text-bone min-w-[1.5ch] text-center font-body">
-                              {item.quantity}
-                            </span>
-                            <button
-                              onClick={() => updateQty(item.variantId, item.quantity + 1)}
-                              aria-label="Increase quantity"
-                              className="w-5 h-5 flex items-center justify-center text-bone/60 hover:text-bone transition-colors cursor-pointer"
-                            >
-                              <Plus size={12} />
+                              <Trash2 size={16} />
                             </button>
                           </div>
                           <p className="text-sm font-body text-bone">

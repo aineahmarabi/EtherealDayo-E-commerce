@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { NewsletterForm } from "./NewsletterForm";
 
@@ -42,9 +43,9 @@ export function Footer() {
           {/* Brand column */}
           <div className="md:col-span-1 flex flex-col gap-6">
             <div className="flex flex-col gap-2">
-              <span className="font-display text-lg tracking-widest uppercase text-bone">
-                Ethereal Dayo
-              </span>
+              <Link href="/" aria-label="Ethereal Dayo — Home" className="relative overflow-hidden h-[50px] w-[220px] mb-2">
+                <Image src="/logo.png" alt="Ethereal Dayo" width={300} height={300} className="object-contain w-[300px] h-[300px] absolute top-1/2 left-[-15px] -translate-y-1/2" />
+              </Link>
               <span className="text-xs tracking-[0.3em] uppercase text-gold">
                 Maison de Parfum
               </span>

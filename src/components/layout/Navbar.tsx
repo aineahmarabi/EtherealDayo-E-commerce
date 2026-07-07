@@ -84,20 +84,16 @@ export function Navbar() {
               All nav links centered as one unit — icons pinned far right.
           */}
           <div className="hidden lg:flex flex-1 items-center relative">
+            {/* Official Logo on the far left */}
+            <Link href="/" className="z-10 flex-shrink-0 relative overflow-hidden h-[50px] w-[220px]" aria-label="Ethereal Dayo — Home">
+              <Image src="/logo.png" alt="Ethereal Dayo" width={300} height={300} className="object-contain w-[300px] h-[300px] absolute top-1/2 left-[-15px] -translate-y-1/2" priority />
+            </Link>
+
             {/* All nav links — absolutely centered in the full nav width */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="flex items-center gap-6 pointer-events-auto">
                 <NavLink href="/for-her">For Her</NavLink>
                 <NavLink href="/catalog">Catalog</NavLink>
-
-                {/* Wordmark */}
-                <Link
-                  href="/"
-                  className="font-display text-xl tracking-widest uppercase text-bone hover:text-gold transition-colors duration-300 whitespace-nowrap px-2"
-                  aria-label="Ethereal Dayo — Home"
-                >
-                  ⟡ Ethereal Dayo ⟡
-                </Link>
 
                 {/* Shop by Brand dropdown */}
                 <div
@@ -216,10 +212,10 @@ export function Navbar() {
 
             <Link
               href="/"
-              className="font-display text-base tracking-widest uppercase text-bone"
+              className="z-10 flex-shrink-0 relative overflow-hidden h-[40px] w-[180px]"
               aria-label="Ethereal Dayo — Home"
             >
-              ⟡ Ethereal Dayo ⟡
+              <Image src="/logo.png" alt="Ethereal Dayo" width={240} height={240} className="object-contain w-[240px] h-[240px] absolute top-1/2 left-[-10px] -translate-y-1/2" priority />
             </Link>
 
             <div className="flex items-center gap-4">

@@ -194,7 +194,9 @@ export default function CheckoutPage() {
     <div className="min-h-dvh bg-ink">
       <header className="sticky top-0 z-50 border-b border-gold/10 bg-noir/90 backdrop-blur-md">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="font-display text-base tracking-widest uppercase text-bone">Ethereal Dayo</Link>
+          <Link href="/" className="flex-shrink-0 relative overflow-hidden h-[40px] w-[180px] sm:h-[50px] sm:w-[220px]" aria-label="Ethereal Dayo — Home">
+            <Image src="/logo.png" alt="Ethereal Dayo" width={300} height={300} className="object-contain w-[240px] h-[240px] sm:w-[300px] sm:h-[300px] absolute top-1/2 left-[-15px] -translate-y-1/2" priority />
+          </Link>
           <div className="flex items-center gap-2 text-xs text-muted-text font-body">
             <Lock size={12} /> Secure Checkout
           </div>
