@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, TrendingUp } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useSearchStore } from "@/store/cartStore";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
@@ -160,8 +161,18 @@ export function SearchOverlay() {
                             onClick={closeSearch}
                             className="flex items-center gap-4 px-5 py-3 hover:bg-bordeaux-deep/30 transition-colors"
                           >
-                            <div className="w-10 h-12 rounded-md bg-bordeaux-deep/40 flex-shrink-0 flex items-center justify-center">
-                              <SearchBottleIcon />
+                            <div className="w-10 h-12 rounded-md bg-bordeaux-deep/40 flex-shrink-0 flex items-center justify-center relative overflow-hidden">
+                              {(product as any).images?.[0] ? (
+                                <Image 
+                                  src={(product as any).images[0]} 
+                                  alt={product.name}
+                                  fill
+                                  className="object-cover"
+                                  sizes="40px"
+                                />
+                              ) : (
+                                <SearchBottleIcon />
+                              )}
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-display text-bone truncate">{product.name}</p>
