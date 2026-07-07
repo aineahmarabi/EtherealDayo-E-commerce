@@ -99,6 +99,9 @@ export default function CheckoutPage() {
   const [address, setAddress] = useState({ line1: "", line2: "", city: "", state: "", zip: "", country: "Kenya" });
   const [selectedShippingId, setSelectedShippingId] = useState("pickup");
   const [gift, setGift] = useState({ enabled: false, message: "" });
+  
+  const [billingOption, setBillingOption] = useState("same");
+  const [billingAddress, setBillingAddress] = useState({ line1: "", line2: "", city: "", state: "", zip: "", country: "Kenya" });
 
   // Discount code state
   const [couponInput, setCouponInput] = useState("");
@@ -263,15 +266,29 @@ export default function CheckoutPage() {
 
           <section className="flex flex-col gap-4 mt-2">
             <h2 className="font-display text-xl text-bone">Billing address</h2>
-            <div className="flex flex-col gap-0 border border-gold/15 rounded-xl bg-bordeaux-deep/10 overflow-hidden">
+            <div className="flex flex-col gap-0 border border-gold/15 rounded-xl bg-bordeaux-deep/10 overflow-hidden transition-all">
               <label className="flex items-center gap-4 cursor-pointer p-4 border-b border-gold/10">
-                <input type="radio" name="billing" value="same" defaultChecked className="accent-gold w-4 h-4" />
+                <input type="radio" name="billing" value="same" checked={billingOption === "same"} onChange={() => setBillingOption("same")} className="accent-gold w-4 h-4" />
                 <span className="text-sm font-body text-bone">Same as shipping address</span>
               </label>
               <label className="flex items-center gap-4 cursor-pointer p-4">
-                <input type="radio" name="billing" value="different" className="accent-gold w-4 h-4" />
+                <input type="radio" name="billing" value="different" checked={billingOption === "different"} onChange={() => setBillingOption("different")} className="accent-gold w-4 h-4" />
                 <span className="text-sm font-body text-bone">Use a different billing address</span>
               </label>
+              
+              {billingOption === "different" && (
+                <div className="flex flex-col gap-4 p-4 pt-2 bg-bordeaux-deep/20 border-t border-gold/10">
+                  <div className="opacity-60 pointer-events-none">
+                    <Field label="Country/Region" name="billingCountry" required value="Kenya" onChange={() => {}} />
+                  </div>
+                  <Field label="Address" name="billingLine1" required placeholder="123 Kimathi St" value={billingAddress.line1} onChange={(v) => setBillingAddress({ ...billingAddress, line1: v })} />
+                  <Field label="Apartment, suite, etc. (optional)" name="billingLine2" placeholder="Apt, Floor, etc." value={billingAddress.line2} onChange={(v) => setBillingAddress({ ...billingAddress, line2: v })} />
+                  <div className="grid grid-cols-2 gap-4">
+                    <Field label="City" name="billingCity" required value={billingAddress.city} onChange={(v) => setBillingAddress({ ...billingAddress, city: v })} />
+                    <Field label="Postal code (optional)" name="billingZip" value={billingAddress.zip} onChange={(v) => setBillingAddress({ ...billingAddress, zip: v })} />
+                  </div>
+                </div>
+              )}
             </div>
           </section>
 
