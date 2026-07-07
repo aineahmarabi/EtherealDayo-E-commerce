@@ -263,7 +263,7 @@ export const bulkImport = mutation({
           description: "",
           order: 0,
         });
-        brand = await ctx.db.get(brandId);
+        brand = (await ctx.db.get(brandId)) ?? undefined;
         if (brand) brands.push(brand);
       }
       
