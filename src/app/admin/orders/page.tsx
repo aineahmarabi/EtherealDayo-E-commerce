@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { motion, AnimatePresence } from "framer-motion";
+import Papa from "papaparse";
 import { api } from "../../../../convex/_generated/api";
 import { formatPrice, formatDate } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { Search, Plus, X, User, MapPin, Package, ChevronRight } from "lucide-react";
+import { Search, Plus, X, User, MapPin, Package, ChevronRight, CheckCircle2, Download, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type Status = "all" | "new" | "dispatched" | "fulfilled" | "refunded" | "cancelled";
@@ -29,12 +30,109 @@ export default function OrdersPage() {
   const [filter, setFilter] = useState<Status>("all");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [importing, setImporting] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   const orders = useQuery(api.orders.list, {
     status: filter === "all" ? undefined : filter,
     limit: 100,
   });
   const updateStatus = useMutation(api.orders.updateStatus);
+  const bulkImport = useMutation(api.orders.bulkImport);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleExport = () => {
+    if (!orders) return;
+    const rows: any[] = [];
+    for (const o of orders) {
+      if (o.lineItems.length === 0) {
+        rows.push({
+          number: o.number, channel: o.channel, customerName: o.customerName,
+          customerEmail: o.customerEmail, customerPhone: o.customerPhone || "",
+          shippingLine1: o.shippingAddress?.line1 || "", shippingLine2: o.shippingAddress?.line2 || "",
+          shippingCity: o.shippingAddress?.city || "", shippingState: o.shippingAddress?.state || "",
+          shippingZip: o.shippingAddress?.zip || "", shippingCountry: o.shippingAddress?.country || "",
+          subtotal: o.subtotal, shipping: o.shipping, tax: o.tax, total: o.total,
+          giftMessage: o.giftMessage || "", status: o.status,
+          variantId: "", productName: "", size: "", concentration: "", qty: 0, price: 0
+        });
+      } else {
+        for (const item of o.lineItems) {
+          rows.push({
+            number: o.number, channel: o.channel, customerName: o.customerName,
+            customerEmail: o.customerEmail, customerPhone: o.customerPhone || "",
+            shippingLine1: o.shippingAddress?.line1 || "", shippingLine2: o.shippingAddress?.line2 || "",
+            shippingCity: o.shippingAddress?.city || "", shippingState: o.shippingAddress?.state || "",
+            shippingZip: o.shippingAddress?.zip || "", shippingCountry: o.shippingAddress?.country || "",
+            subtotal: o.subtotal, shipping: o.shipping, tax: o.tax, total: o.total,
+            giftMessage: o.giftMessage || "", status: o.status,
+            variantId: item.variantId, productName: item.productName, size: item.size, 
+            concentration: item.concentration, qty: item.qty, price: item.price
+          });
+        }
+      }
+    }
+    const csv = Papa.unparse(rows);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `orders_export_${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImporting(true);
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async (results) => {
+        try {
+          const rows = results.data.map((r: any) => ({
+            number: r.number || "",
+            channel: ["web", "manual"].includes(r.channel) ? r.channel : "web",
+            customerName: r.customerName || "",
+            customerEmail: r.customerEmail || "",
+            customerPhone: r.customerPhone || "",
+            shippingLine1: r.shippingLine1 || "",
+            shippingLine2: r.shippingLine2 || "",
+            shippingCity: r.shippingCity || "",
+            shippingState: r.shippingState || "",
+            shippingZip: r.shippingZip || "",
+            shippingCountry: r.shippingCountry || "",
+            subtotal: Number(r.subtotal) || 0,
+            shipping: Number(r.shipping) || 0,
+            tax: Number(r.tax) || 0,
+            total: Number(r.total) || 0,
+            giftMessage: r.giftMessage || "",
+            status: ["new", "dispatched", "fulfilled", "refunded", "cancelled"].includes(r.status) ? r.status : "new",
+            variantId: r.variantId || "",
+            productName: r.productName || "",
+            size: r.size || "",
+            concentration: r.concentration || "",
+            qty: Number(r.qty) || 0,
+            price: Number(r.price) || 0,
+          }));
+          await bulkImport({ rows });
+          showToast(`Imported ${rows.length} line items successfully!`);
+        } catch (error) {
+          console.error(error);
+          showToast("Failed to import. Check console and CSV format.");
+        } finally {
+          setImporting(false);
+          if (fileInputRef.current) fileInputRef.current.value = "";
+        }
+      },
+    });
+  };
 
   const filtered = orders?.filter(
     (o) =>
@@ -47,15 +145,43 @@ export default function OrdersPage() {
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl">
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+            className="fixed top-6 right-6 z-50 px-5 py-3 bg-purple-700/90 backdrop-blur-sm text-white text-sm font-body rounded-xl shadow-xl border border-purple-500/50"
+          >
+            <CheckCircle2 size={14} className="inline mr-2" />{toast}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex items-center justify-between">
         <h1 className="font-display text-2xl text-bone">Orders</h1>
-        <button
-          onClick={() => router.push("/admin/orders/new")}
-          className="flex items-center gap-2 px-4 py-2.5 bg-gold text-noir rounded-full text-xs tracking-widest uppercase font-body hover:bg-gold-soft transition-colors cursor-pointer"
-        >
-          <Plus size={13} />
-          Create Order
-        </button>
+        <div className="flex items-center gap-2">
+          <input type="file" accept=".csv" ref={fileInputRef} onChange={handleImport} className="hidden" />
+          <button 
+            onClick={() => fileInputRef.current?.click()}
+            disabled={importing}
+            className="flex items-center gap-1.5 px-3 py-2 text-xs text-muted-text border border-gold/20 hover:border-gold/40 hover:text-bone rounded-full font-body transition-colors disabled:opacity-50"
+          >
+            <Upload size={13} /> {importing ? "Importing..." : "Import"}
+          </button>
+          <button 
+            onClick={handleExport}
+            disabled={!orders}
+            className="flex items-center gap-1.5 px-3 py-2 text-xs text-muted-text border border-gold/20 hover:border-gold/40 hover:text-bone rounded-full font-body transition-colors disabled:opacity-50"
+          >
+            <Download size={13} /> Export
+          </button>
+          <button
+            onClick={() => router.push("/admin/orders/new")}
+            className="flex items-center gap-2 px-4 py-2.5 bg-gold text-noir rounded-full text-xs tracking-widest uppercase font-body hover:bg-gold-soft transition-colors cursor-pointer"
+          >
+            <Plus size={13} />
+            Create Order
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
