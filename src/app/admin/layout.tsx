@@ -29,8 +29,6 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/admin/brands", label: "Brands & Worlds", icon: Tag },
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/inquiries", label: "Inquiries", icon: MessageSquare },
-  { href: "/admin/marketing", label: "Marketing", icon: Megaphone },
-  { href: "/admin/content", label: "Content / CMS", icon: FileText },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart2 },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
