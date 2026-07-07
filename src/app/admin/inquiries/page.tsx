@@ -53,7 +53,10 @@ export default function InquiriesPage() {
               <li
                 key={inq._id}
                 className={`flex items-start gap-3 px-4 py-4 cursor-pointer transition-colors ${selected === inq._id ? "bg-bordeaux-deep/20" : "hover:bg-bordeaux-deep/10"}`}
-                onClick={() => setSelected(inq._id === selected ? null : inq._id)}
+                onClick={() => {
+                  setSelected(inq._id === selected ? null : inq._id);
+                  if (!inq.read) handleMarkRead(inq._id);
+                }}
               >
                 <button
                   onClick={(e) => { e.stopPropagation(); handleMarkRead(inq._id); }}
