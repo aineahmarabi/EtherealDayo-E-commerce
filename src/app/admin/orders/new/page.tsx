@@ -75,8 +75,8 @@ function ProductPicker({ onAdd }: { onAdd: (item: Omit<LineItem, "qty">) => void
   const handleProductSelect = (product: typeof allProducts extends (infer T)[] | undefined ? T : never) => {
     if (!product || !allVariants) return;
     
-    const pId = (product as { _id: string })._id;
-    const pName = (product as { name: string }).name;
+    const pId = (product as any)._id;
+    const pName = (product as any).name;
     const vForP = allVariants.filter(v => v.productId === pId);
     
     if (vForP.length === 1) {
