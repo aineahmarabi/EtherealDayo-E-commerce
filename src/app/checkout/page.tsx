@@ -57,7 +57,7 @@ function Field({ label, name, type = "text", required, placeholder, value, onCha
         id={name} name={name} type={type} required={required}
         placeholder={placeholder} value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-bordeaux-deep/10 border border-gold/15 rounded-lg px-4 py-3 text-sm text-bone font-body placeholder:text-muted-text focus:border-gold/40 focus:outline-none transition-colors"
+        className="w-full bg-bordeaux-deep/10 border border-gold/15 rounded-lg px-4 py-3 text-base sm:text-sm text-bone font-body placeholder:text-muted-text focus:border-gold/40 focus:outline-none transition-colors"
       />
     </div>
   );
@@ -369,7 +369,7 @@ export default function CheckoutPage() {
                   value={couponInput}
                   onChange={(e) => { setCouponInput(e.target.value.toUpperCase()); setCouponError(""); }}
                   placeholder="Enter code"
-                  className="flex-1 px-3 py-2 text-sm bg-noir border border-gold/15 rounded-lg text-bone font-body placeholder:text-muted-text focus:border-gold/40 focus:outline-none transition-colors"
+                  className="flex-1 px-3 py-2 text-base sm:text-sm bg-noir border border-gold/15 rounded-lg text-bone font-body placeholder:text-muted-text focus:border-gold/40 focus:outline-none transition-colors"
                 />
                 <button onClick={handleApplyCoupon} className="px-4 py-2 bg-gold/20 hover:bg-gold/30 text-gold text-xs font-body rounded-lg transition-colors cursor-pointer whitespace-nowrap">
                   Apply
@@ -406,12 +406,12 @@ export default function CheckoutPage() {
 
       {/* Minimal Checkout Footer */}
       <footer className="mt-20 border-t border-gold/10 pt-8 pb-12 flex flex-col items-center gap-4 text-[10px] uppercase tracking-widest text-muted-text font-body">
-        <div className="flex gap-4 text-[11px] text-gold/60">
+        <div className="flex flex-wrap justify-center gap-4 text-[11px] text-gold/60 px-4 text-center">
           <Link href="/returns" className="hover:text-gold transition-colors">Refund policy</Link>
           <Link href="/privacy" className="hover:text-gold transition-colors">Privacy policy</Link>
           <Link href="/terms" className="hover:text-gold transition-colors">Terms of service</Link>
         </div>
-        <p>© {new Date().getFullYear()} Ethereal Dayo. All rights reserved.</p>
+        <p className="text-center opacity-60">© {new Date().getFullYear()} ETHEREAL DAYO. ALL RIGHTS RESERVED.</p>
       </footer>
     </div>
   );
