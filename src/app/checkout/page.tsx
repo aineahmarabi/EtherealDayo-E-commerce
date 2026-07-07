@@ -200,7 +200,7 @@ export default function CheckoutPage() {
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 grid lg:grid-cols-[1fr_380px] gap-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 flex flex-col-reverse lg:grid lg:grid-cols-[1fr_380px] gap-12">
         <form onSubmit={placeOrder} className="flex flex-col gap-10">
           <section className="flex flex-col gap-4">
             <h2 className="font-display text-xl text-bone">Contact</h2>
@@ -314,12 +314,6 @@ export default function CheckoutPage() {
             className="w-full py-5 bg-gold text-noir rounded-xl text-sm tracking-widest uppercase font-body hover:bg-gold-soft transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer mt-2 shadow-lg shadow-gold/10">
             {placing ? "Processing..." : `Place order — ${formatKES(orderTotal)}`}
           </button>
-          
-          <div className="flex gap-4 text-[11px] text-gold/60 font-body justify-center mt-2">
-            <Link href="/returns" className="hover:text-gold transition-colors">Refund policy</Link>
-            <Link href="/privacy" className="hover:text-gold transition-colors">Privacy policy</Link>
-            <Link href="/terms" className="hover:text-gold transition-colors">Terms of service</Link>
-          </div>
         </form>
 
         {/* Right: order summary */}
@@ -410,7 +404,12 @@ export default function CheckoutPage() {
       </div>
 
       {/* Minimal Checkout Footer */}
-      <footer className="mt-20 border-t border-gold/10 pt-8 pb-12 flex justify-center text-[10px] uppercase tracking-widest text-muted-text font-body">
+      <footer className="mt-20 border-t border-gold/10 pt-8 pb-12 flex flex-col items-center gap-4 text-[10px] uppercase tracking-widest text-muted-text font-body">
+        <div className="flex gap-4 text-[11px] text-gold/60">
+          <Link href="/returns" className="hover:text-gold transition-colors">Refund policy</Link>
+          <Link href="/privacy" className="hover:text-gold transition-colors">Privacy policy</Link>
+          <Link href="/terms" className="hover:text-gold transition-colors">Terms of service</Link>
+        </div>
         <p>© {new Date().getFullYear()} Ethereal Dayo. All rights reserved.</p>
       </footer>
     </div>
