@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
@@ -128,9 +129,15 @@ function ProductPicker({ onAdd }: { onAdd: (item: Omit<LineItem, "qty">) => void
                 onClick={() => handleProductSelect(product)}
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-purple-900/20 transition-colors text-left border-b border-gold/5 last:border-0"
               >
-                <Package size={14} className="text-purple-400 flex-shrink-0" />
-                <div>
-                  <p className="text-sm text-bone font-body">{product.name}</p>
+                {product.images && product.images.length > 0 ? (
+                  <Image src={product.images[0]} alt={product.name} width={32} height={32} className="w-8 h-8 object-cover rounded bg-white/5 flex-shrink-0" />
+                ) : (
+                  <div className="w-8 h-8 rounded bg-white/5 flex-shrink-0 flex items-center justify-center">
+                    <Package size={14} className="text-muted-text" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-bone font-body truncate">{product.name}</p>
                   <p className="text-[10px] text-muted-text">{product.brandName} · {product.family}</p>
                 </div>
               </button>

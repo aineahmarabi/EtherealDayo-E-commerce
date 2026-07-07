@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -13,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { useAdminAuth } from "@/store/adminAuthStore";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
+import { AdminTopBar } from "@/components/admin/AdminTopBar";
 
 type NavItem = {
   href: string;
@@ -113,9 +115,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex items-center justify-between px-6 py-6 border-b border-gold/10">
-          <Link href="/admin" className="flex flex-col gap-0.5">
-            <span className="font-display text-base tracking-widest uppercase text-bone">Ethereal Dayo</span>
-            <span className="text-[9px] tracking-[0.3em] uppercase text-gold font-body">Admin Panel</span>
+          <Link href="/admin" className="flex flex-col gap-0 items-start relative z-10 overflow-hidden h-[60px] w-full justify-center">
+            <Image src="/logo.png" alt="Ethereal Dayo" width={240} height={240} className="object-contain w-[220px] h-[220px] absolute top-1/2 left-[-10px] -translate-y-1/2" priority />
           </Link>
           <button onClick={() => setMobileMenuOpen(false)} className="lg:hidden p-1 text-muted-text hover:text-bone transition-colors">
             <X size={18} />
@@ -172,12 +173,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       <main className="flex-1 lg:ml-64 min-h-dvh bg-ink flex flex-col max-w-full">
-        <div className="lg:hidden flex items-center gap-4 px-4 h-14 border-b border-gold/10 bg-noir sticky top-0 z-30 shadow-sm">
-          <button onClick={() => setMobileMenuOpen(true)} className="p-1.5 -ml-1.5 text-bone hover:bg-white/5 rounded-md transition-colors">
-            <Menu size={20} />
-          </button>
-          <span className="font-display text-sm tracking-widest uppercase text-bone">Ethereal Dayo</span>
-        </div>
+        <AdminTopBar onMenuClick={() => setMobileMenuOpen(true)} />
 
         <motion.div
           key={pathname}
