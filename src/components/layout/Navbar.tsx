@@ -23,8 +23,13 @@ export function Navbar() {
   const { openSearch } = useSearchStore();
   
   const [mounted, setMounted] = useState(false);
+  const [hasOrder, setHasOrder] = useState(false);
+  
   useEffect(() => {
     setMounted(true);
+    if (typeof window !== "undefined" && localStorage.getItem("ethereal_latest_order")) {
+      setHasOrder(true);
+    }
   }, []);
 
   const count = mounted ? itemCount() : 0;
@@ -94,6 +99,7 @@ export function Navbar() {
               <div className="flex items-center gap-6 pointer-events-auto">
                 <NavLink href="/for-her">For Her</NavLink>
                 <NavLink href="/catalog">Catalog</NavLink>
+                {hasOrder && <NavLink href="/track">Track Order</NavLink>}
 
                 {/* Shop by Brand dropdown */}
                 <div
@@ -291,6 +297,7 @@ export function Navbar() {
                 <MobileNavLink href="/bestsellers" onClick={() => setMenuOpen(false)}>Bestsellers</MobileNavLink>
                 <MobileNavLink href="/new-arrivals" onClick={() => setMenuOpen(false)}>New Arrivals</MobileNavLink>
                 <MobileNavLink href="/catalog" onClick={() => setMenuOpen(false)}>Full Catalog</MobileNavLink>
+                {hasOrder && <MobileNavLink href="/track" onClick={() => setMenuOpen(false)}>Track Order</MobileNavLink>}
 
                 <div className="hairline my-5" />
 
