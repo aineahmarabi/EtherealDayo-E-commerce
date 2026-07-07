@@ -4,12 +4,21 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus, Minus, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/utils";
 
 export function CartDrawer() {
   const { isOpen, closeCart, items, removeItem, updateQty, total } = useCartStore();
-  const cartTotal = total();
+  
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const cartTotal = mounted ? total() : 0;
+
+  if (!mounted) return null;
 
   return (
     <AnimatePresence>
