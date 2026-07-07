@@ -318,7 +318,7 @@ export default function CheckoutPage() {
         </form>
 
         {/* Right: order summary */}
-        <aside className="flex flex-col gap-6 lg:sticky lg:top-24 self-start">
+        <aside className="flex flex-col gap-6 w-full lg:w-auto lg:sticky lg:top-24 lg:self-start">
           <h3 className="font-display text-lg text-bone">Order Summary</h3>
           <ul className="flex flex-col gap-4">
             {items.map((item) => (
