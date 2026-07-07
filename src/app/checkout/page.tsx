@@ -146,7 +146,8 @@ export default function CheckoutPage() {
     );
   }
 
-  const placeOrder = async () => {
+  const placeOrder = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (placing) return;
     setPlacing(true);
     try {
@@ -192,7 +193,7 @@ export default function CheckoutPage() {
       </header>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 grid lg:grid-cols-[1fr_380px] gap-12">
-        <div className="flex flex-col gap-10">
+        <form onSubmit={placeOrder} className="flex flex-col gap-10">
           <section className="flex flex-col gap-4">
             <h2 className="font-display text-xl text-bone">Contact</h2>
             <div className="flex flex-col gap-4">
@@ -301,7 +302,7 @@ export default function CheckoutPage() {
             </div>
           </section>
 
-          <button onClick={placeOrder} disabled={!contact.email || !contact.name || placing}
+          <button type="submit" disabled={placing}
             className="w-full py-5 bg-gold text-noir rounded-xl text-sm tracking-widest uppercase font-body hover:bg-gold-soft transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer mt-2 shadow-lg shadow-gold/10">
             {placing ? "Processing..." : `Place order — ${formatKES(orderTotal)}`}
           </button>
@@ -311,7 +312,7 @@ export default function CheckoutPage() {
             <Link href="/privacy" className="hover:text-gold transition-colors">Privacy policy</Link>
             <Link href="/terms" className="hover:text-gold transition-colors">Terms of service</Link>
           </div>
-        </div>
+        </form>
 
         {/* Right: order summary */}
         <aside className="flex flex-col gap-6 lg:sticky lg:top-24 self-start">
