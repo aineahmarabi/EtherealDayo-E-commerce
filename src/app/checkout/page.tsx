@@ -188,80 +188,102 @@ export default function CheckoutPage() {
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 grid lg:grid-cols-[1fr_380px] gap-12">
         <div className="flex flex-col gap-10">
-          <section className="flex flex-col gap-6">
-            <h2 className="font-display text-2xl text-bone">1. Contact</h2>
+          <section className="flex flex-col gap-4">
+            <h2 className="font-display text-xl text-bone">Contact</h2>
             <div className="flex flex-col gap-4">
-              <Field label="Full Name" name="name" required placeholder="Your name" value={contact.name} onChange={(v) => setContact({ ...contact, name: v })} />
-              <Field label="Email" name="email" type="email" required placeholder="your@email.com" value={contact.email} onChange={(v) => setContact({ ...contact, email: v })} />
-              <Field label="Phone (optional)" name="phone" type="tel" placeholder="+254 700 000000" value={contact.phone} onChange={(v) => setContact({ ...contact, phone: v })} />
+              <Field label="Email or mobile phone number" name="emailOrPhone" type="text" required placeholder="your@email.com or +254..." value={contact.email} onChange={(v) => setContact({ ...contact, email: v })} />
             </div>
           </section>
 
-          <hr className="border-gold/10" />
+          <section className="flex flex-col gap-4">
+            <h2 className="font-display text-xl text-bone">Delivery</h2>
+            <div className="flex flex-col gap-4">
+              <div className="opacity-60 pointer-events-none">
+                <Field label="Country/Region" name="country" required value="Kenya" onChange={() => {}} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="First name" name="firstName" required placeholder="First name" value={contact.name.split(' ')[0] || ''} onChange={(v) => setContact({ ...contact, name: v + ' ' + (contact.name.split(' ').slice(1).join(' ') || '') })} />
+                <Field label="Last name" name="lastName" required placeholder="Last name" value={contact.name.split(' ').slice(1).join(' ') || ''} onChange={(v) => setContact({ ...contact, name: (contact.name.split(' ')[0] || '') + ' ' + v })} />
+              </div>
+              <Field label="Address" name="line1" required placeholder="123 Kimathi St" value={address.line1} onChange={(v) => setAddress({ ...address, line1: v })} />
+              <Field label="Apartment, suite, etc. (optional)" name="line2" placeholder="Apt, Floor, etc." value={address.line2} onChange={(v) => setAddress({ ...address, line2: v })} />
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="City" name="city" required value={address.city} onChange={(v) => setAddress({ ...address, city: v })} />
+                <Field label="Postal code (optional)" name="zip" value={address.zip} onChange={(v) => setAddress({ ...address, zip: v })} />
+              </div>
+              <label className="flex items-center gap-3 cursor-pointer group mt-2">
+                <input type="checkbox" className="w-4 h-4 accent-gold cursor-pointer" />
+                <span className="text-sm text-bone/70 group-hover:text-bone font-body transition-colors">Save this information for next time</span>
+              </label>
+            </div>
+          </section>
 
-          <section className="flex flex-col gap-6">
-            <h2 className="font-display text-2xl text-bone">2. Delivery Method</h2>
-            <div className="flex flex-col gap-3">
-              <p className="text-xs tracking-widest uppercase text-muted-text font-body">Choose your delivery option</p>
+          <section className="flex flex-col gap-4">
+            <h2 className="font-display text-xl text-bone">Shipping method</h2>
+            <div className="flex flex-col gap-3 bg-bordeaux-deep/10 border border-gold/15 rounded-xl p-4">
               {shippingRates.map((rate) => (
-                <label key={rate._id} className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${selectedShippingId === rate._id ? "border-gold bg-bordeaux-deep/20" : "border-gold/15 hover:border-gold/30"}`}>
+                <label key={rate._id} className="flex items-center gap-4 cursor-pointer py-2">
                   <input type="radio" name="shipping" value={rate._id} checked={selectedShippingId === rate._id}
-                    onChange={() => { setSelectedShippingId(rate._id); if (rate._id === "pickup") setAddress({ line1: "", line2: "", city: "", state: "", zip: "", country: "Kenya" }); }}
-                    className="accent-gold w-4 h-4" />
-                  <div className="flex-1">
-                    <p className="text-sm font-body text-bone">{rate.name}</p>
+                    onChange={() => setSelectedShippingId(rate._id)}
+                    className="accent-gold w-4 h-4 mt-0.5 self-start" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-body text-bone leading-tight">{rate.name}</p>
                   </div>
-                  <span className="text-sm text-gold font-body font-medium">
-                    {rate.price === 0 ? "Free" : formatKES(rate.price)}
+                  <span className="text-sm text-bone font-body font-medium flex-shrink-0">
+                    {rate.price === 0 ? "FREE" : formatKES(rate.price)}
                   </span>
                 </label>
               ))}
             </div>
-
-            {selectedShippingId !== "pickup" && (
-              <div className="flex flex-col gap-4 mt-2">
-                <h3 className="text-base font-display text-bone">Shipping Address</h3>
-                <Field label="Address Line 1" name="line1" required placeholder="123 Kimathi St" value={address.line1} onChange={(v) => setAddress({ ...address, line1: v })} />
-                <Field label="Address Line 2" name="line2" placeholder="Apt, Floor, etc." value={address.line2} onChange={(v) => setAddress({ ...address, line2: v })} />
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label="City" name="city" required value={address.city} onChange={(v) => setAddress({ ...address, city: v })} />
-                  <Field label="Area / County" name="state" required value={address.state} onChange={(v) => setAddress({ ...address, state: v })} />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label="Postal Code" name="zip" value={address.zip} onChange={(v) => setAddress({ ...address, zip: v })} />
-                  <Field label="Country" name="country" required value={address.country} onChange={(v) => setAddress({ ...address, country: v })} />
-                </div>
-              </div>
-            )}
-
-            <div className="flex flex-col gap-3 mt-2">
-              <label className="flex items-center gap-3 cursor-pointer group">
-                <input type="checkbox" checked={gift.enabled} onChange={(e) => setGift({ ...gift, enabled: e.target.checked })} className="w-4 h-4 accent-gold cursor-pointer" />
-                <span className="text-sm text-bone/70 group-hover:text-bone font-body transition-colors">This is a gift</span>
-              </label>
-              {gift.enabled && (
-                <textarea placeholder="Gift message (optional)" value={gift.message}
-                  onChange={(e) => setGift({ ...gift, message: e.target.value })} rows={3}
-                  className="w-full bg-bordeaux-deep/10 border border-gold/15 rounded-lg px-4 py-3 text-sm text-bone font-body placeholder:text-muted-text focus:border-gold/40 focus:outline-none transition-colors resize-none" />
-              )}
-            </div>
           </section>
 
           <hr className="border-gold/10" />
 
-          <section className="flex flex-col gap-6">
-            <h2 className="font-display text-2xl text-bone">3. Payment</h2>
-            <div className="p-6 rounded-xl border border-gold/15 bg-bordeaux-deep/10">
-              <p className="text-sm text-muted-text font-body text-center">
-                Stripe payment integration — wire in your publishable key via <code className="text-gold text-xs bg-noir px-1.5 py-0.5 rounded">NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</code>
-              </p>
+          <section className="flex flex-col gap-4">
+            <h2 className="font-display text-xl text-bone">Payment</h2>
+            <p className="text-xs text-muted-text font-body">All transactions are secure and encrypted.</p>
+            <div className="flex flex-col gap-0 border border-gold/15 rounded-xl bg-bordeaux-deep/10 overflow-hidden">
+              <label className="flex items-center gap-4 cursor-pointer p-4 border-b border-gold/10">
+                <input type="radio" name="payment" value="cod" defaultChecked className="accent-gold w-4 h-4" />
+                <div className="flex flex-col">
+                  <p className="text-sm font-body text-bone">Cash on Delivery</p>
+                  <p className="text-xs text-muted-text font-body mt-0.5">Pay when your order arrives</p>
+                </div>
+              </label>
+              <label className="flex items-center gap-4 cursor-pointer p-4">
+                <input type="radio" name="payment" value="card" className="accent-gold w-4 h-4" />
+                <div className="flex flex-col">
+                  <p className="text-sm font-body text-bone">Card / Mobile Money</p>
+                  <p className="text-xs text-muted-text font-body mt-0.5">Pay securely online, instantly confirmed</p>
+                </div>
+              </label>
             </div>
           </section>
 
-          <button onClick={placeOrder} disabled={!contact.name || !contact.email || (selectedShippingId !== "pickup" && (!address.line1 || !address.city)) || placing}
-            className="w-full py-5 bg-gold text-noir rounded-xl text-sm tracking-widest uppercase font-body hover:bg-gold-soft transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer mt-4 shadow-lg shadow-gold/10">
-            {placing ? "Processing..." : `Complete Order · ${formatKES(orderTotal)}`}
+          <section className="flex flex-col gap-4 mt-2">
+            <h2 className="font-display text-xl text-bone">Billing address</h2>
+            <div className="flex flex-col gap-0 border border-gold/15 rounded-xl bg-bordeaux-deep/10 overflow-hidden">
+              <label className="flex items-center gap-4 cursor-pointer p-4 border-b border-gold/10">
+                <input type="radio" name="billing" value="same" defaultChecked className="accent-gold w-4 h-4" />
+                <span className="text-sm font-body text-bone">Same as shipping address</span>
+              </label>
+              <label className="flex items-center gap-4 cursor-pointer p-4">
+                <input type="radio" name="billing" value="different" className="accent-gold w-4 h-4" />
+                <span className="text-sm font-body text-bone">Use a different billing address</span>
+              </label>
+            </div>
+          </section>
+
+          <button onClick={placeOrder} disabled={!contact.email || !contact.name || placing}
+            className="w-full py-5 bg-gold text-noir rounded-xl text-sm tracking-widest uppercase font-body hover:bg-gold-soft transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer mt-2 shadow-lg shadow-gold/10">
+            {placing ? "Processing..." : `Place order — ${formatKES(orderTotal)}`}
           </button>
+          
+          <div className="flex gap-4 text-[11px] text-gold/60 font-body justify-center mt-2">
+            <Link href="/returns" className="hover:text-gold transition-colors">Refund policy</Link>
+            <Link href="/privacy" className="hover:text-gold transition-colors">Privacy policy</Link>
+            <Link href="/terms" className="hover:text-gold transition-colors">Terms of service</Link>
+          </div>
         </div>
 
         {/* Right: order summary */}
