@@ -58,14 +58,13 @@ export const global = query({
     const customers = await ctx.db.query("customers").collect();
     for (const c of customers) {
       if (
-        c.firstName.toLowerCase().includes(term) ||
-        c.lastName.toLowerCase().includes(term) ||
+        c.name.toLowerCase().includes(term) ||
         c.email.toLowerCase().includes(term)
       ) {
         results.push({
           id: c._id,
           type: "customer",
-          title: `${c.firstName} ${c.lastName}`,
+          title: c.name,
           subtitle: c.email,
           href: `/admin/customers`,
         });
