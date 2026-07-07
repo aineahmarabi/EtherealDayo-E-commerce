@@ -92,7 +92,8 @@ export default function CheckoutPage() {
   const cartTotal = total();
   const createOrder = useMutation(api.orders.create);
 
-  const shippingRates = LOCAL_SHIPPING_RATES;
+  const shippingRatesDB = useQuery(api.shipping.listActive);
+  const shippingRates = shippingRatesDB ?? LOCAL_SHIPPING_RATES;
 
   const [mounted, setMounted] = useState(false);
   
