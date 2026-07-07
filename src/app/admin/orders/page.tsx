@@ -73,8 +73,8 @@ export default function OrdersPage() {
             </button>
           ))}
         </div>
-        <div className="relative ml-auto">
-          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-text pointer-events-none" />
+        <div className="relative ml-auto flex items-center">
+          <Search size={13} className="absolute left-3 text-muted-text pointer-events-none" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}

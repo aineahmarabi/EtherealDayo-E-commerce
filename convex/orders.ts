@@ -231,3 +231,114 @@ export const remove = mutation({
     await ctx.db.delete(id);
   },
 });
+
+export const bulkImport = mutation({
+  args: {
+    rows: v.array(
+      v.object({
+        number: v.string(),
+        channel: v.union(v.literal("web"), v.literal("manual")),
+        customerName: v.string(),
+        customerEmail: v.string(),
+        customerPhone: v.optional(v.string()),
+        shippingLine1: v.string(),
+        shippingLine2: v.string(),
+        shippingCity: v.string(),
+        shippingState: v.string(),
+        shippingZip: v.string(),
+        shippingCountry: v.string(),
+        subtotal: v.number(),
+        shipping: v.number(),
+        tax: v.number(),
+        total: v.number(),
+        giftMessage: v.string(),
+        status: v.union(v.literal("new"), v.literal("dispatched"), v.literal("fulfilled"), v.literal("refunded"), v.literal("cancelled")),
+        variantId: v.string(),
+        productName: v.string(),
+        size: v.string(),
+        concentration: v.string(),
+        qty: v.number(),
+        price: v.number(),
+      })
+    ),
+  },
+  handler: async (ctx, { rows }) => {
+    // Group rows by order number to recreate the lineItems array
+    const ordersMap = new Map<string, any>();
+
+    for (const row of rows) {
+      if (!ordersMap.has(row.number)) {
+        ordersMap.set(row.number, {
+          number: row.number,
+          channel: row.channel,
+          customerName: row.customerName,
+          customerEmail: row.customerEmail,
+          customerPhone: row.customerPhone || undefined,
+          shippingAddress: row.shippingLine1 ? {
+            line1: row.shippingLine1,
+            line2: row.shippingLine2 || undefined,
+            city: row.shippingCity,
+            state: row.shippingState,
+            zip: row.shippingZip,
+            country: row.shippingCountry || "Kenya",
+          } : undefined,
+          subtotal: row.subtotal,
+          shipping: row.shipping,
+          tax: row.tax,
+          total: row.total,
+          giftMessage: row.giftMessage || undefined,
+          status: row.status,
+          lineItems: [],
+        });
+      }
+
+      if (row.productName && row.qty > 0) {
+        ordersMap.get(row.number).lineItems.push({
+          variantId: row.variantId || "imported",
+          productName: row.productName,
+          size: row.size,
+          concentration: row.concentration,
+          qty: row.qty,
+          price: row.price,
+        });
+      }
+    }
+
+    for (const order of Array.from(ordersMap.values())) {
+      const existingOrder = await ctx.db
+        .query("orders")
+        .withIndex("by_number", (q) => q.eq("number", order.number))
+        .first();
+
+      if (existingOrder) {
+        await ctx.db.patch(existingOrder._id, order);
+      } else {
+        await ctx.db.insert("orders", order);
+        
+        // Also update or create customer ledger
+        const customer = await ctx.db
+          .query("customers")
+          .withIndex("by_email", (q) => q.eq("email", order.customerEmail))
+          .first();
+
+        if (customer) {
+          await ctx.db.patch(customer._id, {
+            totalOrders: customer.totalOrders + 1,
+            totalSpent: customer.totalSpent + order.total,
+            name: order.customerName,
+            phone: order.customerPhone || customer.phone,
+          });
+        } else {
+          await ctx.db.insert("customers", {
+            name: order.customerName,
+            email: order.customerEmail,
+            phone: order.customerPhone || undefined,
+            tags: ["Imported"],
+            totalOrders: 1,
+            totalSpent: order.total,
+          });
+        }
+      }
+    }
+  },
+});

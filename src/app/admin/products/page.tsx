@@ -189,8 +189,8 @@ export default function ProductsPage() {
       </div>
 
       {/* Search */}
-      <div className="relative max-w-sm">
-        <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-text pointer-events-none" />
+      <div className="relative max-w-sm flex items-center">
+        <Search size={13} className="absolute left-3 text-muted-text pointer-events-none" />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
