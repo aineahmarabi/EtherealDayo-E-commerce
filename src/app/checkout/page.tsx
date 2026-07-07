@@ -10,6 +10,7 @@ import { api } from "../../../convex/_generated/api";
 import { generateOrderNumber } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { ChevronRight, Lock, Tag, X } from "lucide-react";
+import { Visa, Mastercard, MPesa, AirtelMoney } from "@/components/checkout/PaymentIcons";
 
 function formatKES(amount: number): string {
   return new Intl.NumberFormat("en-KE", {
@@ -254,11 +255,19 @@ export default function CheckoutPage() {
                   <p className="text-xs text-muted-text font-body mt-0.5">Pay when your order arrives</p>
                 </div>
               </label>
-              <label className="flex items-center gap-4 cursor-pointer p-4">
-                <input type="radio" name="payment" value="card" className="accent-gold w-4 h-4" />
-                <div className="flex flex-col">
-                  <p className="text-sm font-body text-bone">Card / Mobile Money</p>
-                  <p className="text-xs text-muted-text font-body mt-0.5">Pay securely online, instantly confirmed</p>
+              <label className="flex items-start gap-4 cursor-pointer p-4">
+                <input type="radio" name="payment" value="card" className="accent-gold w-4 h-4 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-center w-full flex-wrap gap-2">
+                    <p className="text-sm font-body text-bone">Card / Mobile Money</p>
+                    <div className="flex gap-1.5 items-center">
+                      <Visa />
+                      <Mastercard />
+                      <MPesa />
+                      <AirtelMoney />
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-text font-body mt-1">Pay securely online, instantly confirmed</p>
                 </div>
               </label>
             </div>
