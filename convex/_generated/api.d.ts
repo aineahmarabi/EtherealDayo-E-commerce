@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as adminSearch from "../adminSearch.js";
 import type * as brands from "../brands.js";
 import type * as customers from "../customers.js";
 import type * as discountCodes from "../discountCodes.js";
@@ -16,7 +17,6 @@ import type * as orders from "../orders.js";
 import type * as pageViews from "../pageViews.js";
 import type * as products from "../products.js";
 import type * as search from "../search.js";
-import type * as seed from "../seed.js";
 import type * as settings from "../settings.js";
 import type * as shipping from "../shipping.js";
 import type * as uploads from "../uploads.js";
@@ -29,6 +29,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  adminSearch: typeof adminSearch;
   brands: typeof brands;
   customers: typeof customers;
   discountCodes: typeof discountCodes;
@@ -37,7 +38,6 @@ declare const fullApi: ApiFromModules<{
   pageViews: typeof pageViews;
   products: typeof products;
   search: typeof search;
-  seed: typeof seed;
   settings: typeof settings;
   shipping: typeof shipping;
   uploads: typeof uploads;
