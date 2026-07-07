@@ -82,6 +82,8 @@ export default defineSchema({
     tax: v.number(),
     total: v.number(),
     giftMessage: v.optional(v.string()),
+    shippingMethod: v.optional(v.string()),
+    paymentMethod: v.optional(v.string()),
     status: v.union(
       v.literal("new"),
       v.literal("dispatched"),

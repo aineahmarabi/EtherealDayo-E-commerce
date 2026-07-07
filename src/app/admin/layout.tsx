@@ -45,7 +45,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   // Real-time badge counts
   const allOrders = useQuery(api.orders.list, { limit: 999 });
   const allInquiries = useQuery(api.inquiries.list, { unreadOnly: false });
-  const orderCount = allOrders?.length ?? 0;
+  const orderCount = allOrders?.filter(o => o.status === "new").length ?? 0;
   const unreadInquiries = allInquiries?.filter(i => !i.read).length ?? 0;
 
   useEffect(() => { setMounted(true); }, []);

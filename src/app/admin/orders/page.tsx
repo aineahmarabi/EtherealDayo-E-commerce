@@ -7,7 +7,7 @@ import Papa from "papaparse";
 import { api } from "../../../../convex/_generated/api";
 import { formatPrice, formatDate } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { Search, Plus, X, User, MapPin, Package, ChevronRight, CheckCircle2, Download, Upload } from "lucide-react";
+import { Search, Plus, X, User, MapPin, Package, ChevronRight, CheckCircle2, Download, Upload, Trash2, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type Status = "all" | "new" | "dispatched" | "fulfilled" | "refunded" | "cancelled";
@@ -30,6 +30,8 @@ export default function OrdersPage() {
   const [filter, setFilter] = useState<Status>("all");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
+  const [deletePromptFor, setDeletePromptFor] = useState<string | null>(null);
+  const [restoreStock, setRestoreStock] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importing, setImporting] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -39,6 +41,7 @@ export default function OrdersPage() {
     limit: 100,
   });
   const updateStatus = useMutation(api.orders.updateStatus);
+  const deleteOrderMutation = useMutation(api.orders.deleteOrder);
   const bulkImport = useMutation(api.orders.bulkImport);
 
   const showToast = (msg: string) => {
@@ -285,7 +288,7 @@ export default function OrdersPage() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-text font-body">{formatDate(selectedOrder._creationTime)}</span>
-                <button onClick={() => setSelected(null)} className="p-1.5 rounded-full text-muted-text hover:text-bone hover:bg-white/5 transition-colors ml-2"><X size={15} /></button>
+                <button onClick={() => { setSelected(null); setDeletePromptFor(null); }} className="p-1.5 rounded-full text-muted-text hover:text-bone hover:bg-white/5 transition-colors ml-2"><X size={15} /></button>
               </div>
             </div>
 
@@ -363,7 +366,52 @@ export default function OrdersPage() {
                 </div>
                 <div className="pt-4 border-t border-purple-700/20">
                   <p className="text-[10px] uppercase tracking-widest text-muted-text font-body mb-2">Order ID</p>
-                  <p className="text-[10px] text-muted-text font-mono break-all">{selectedOrder._id}</p>
+                  <p className="text-[10px] text-muted-text font-mono break-all mb-4">{selectedOrder._id}</p>
+
+                  {deletePromptFor !== selectedOrder._id ? (
+                    <button
+                      onClick={() => setDeletePromptFor(selectedOrder._id)}
+                      className="flex items-center gap-2 text-xs text-dusty-rose border border-bordeaux/50 bg-bordeaux/20 hover:bg-bordeaux/40 px-3 py-2 rounded-lg transition-colors font-body"
+                    >
+                      <Trash2 size={13} /> Delete Order...
+                    </button>
+                  ) : (
+                    <div className="flex flex-col gap-3 p-4 border border-bordeaux/50 bg-bordeaux/20 rounded-xl mt-2">
+                      <div className="flex gap-2 text-dusty-rose">
+                        <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
+                        <p className="text-xs leading-tight font-body">Were the items in this order returned to stock? Choose how to handle inventory before deleting.</p>
+                      </div>
+                      
+                      <label className="flex items-center gap-3 cursor-pointer mt-1">
+                        <input type="radio" checked={restoreStock} onChange={() => setRestoreStock(true)} className="accent-dusty-rose w-4 h-4" />
+                        <span className="text-xs text-bone font-body">Delete + Restore inventory</span>
+                      </label>
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input type="radio" checked={!restoreStock} onChange={() => setRestoreStock(false)} className="accent-dusty-rose w-4 h-4" />
+                        <span className="text-xs text-bone font-body">Delete without restoring</span>
+                      </label>
+
+                      <div className="flex gap-2 mt-2 pt-3 border-t border-bordeaux/30">
+                        <button
+                          onClick={async () => {
+                            await deleteOrderMutation({ orderId: selectedOrder._id, restoreInventory: restoreStock });
+                            setSelected(null);
+                            setDeletePromptFor(null);
+                            showToast("Order permanently deleted.");
+                          }}
+                          className="flex-1 bg-dusty-rose text-noir text-xs font-body py-2 rounded-lg font-bold hover:bg-red-400 transition-colors"
+                        >
+                          Confirm Delete
+                        </button>
+                        <button
+                          onClick={() => setDeletePromptFor(null)}
+                          className="flex-1 border border-bordeaux/50 text-bone text-xs font-body py-2 rounded-lg hover:bg-bordeaux/30 transition-colors"
+                        >
+                          Keep Order
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

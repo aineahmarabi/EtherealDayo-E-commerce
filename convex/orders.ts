@@ -62,6 +62,8 @@ export const create = mutation({
     tax: v.number(),
     total: v.number(),
     giftMessage: v.optional(v.string()),
+    shippingMethod: v.optional(v.string()),
+    paymentMethod: v.optional(v.string()),
     stripePaymentIntentId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -340,5 +342,28 @@ export const bulkImport = mutation({
         }
       }
     }
+  },
+});
+
+export const deleteOrder = mutation({
+  args: {
+    orderId: v.id("orders"),
+    restoreInventory: v.boolean(),
+  },
+  handler: async (ctx, { orderId, restoreInventory }) => {
+    const order = await ctx.db.get(orderId);
+    if (!order) throw new Error("Order not found");
+
+    if (restoreInventory) {
+      const variants = await ctx.db.query("variants").collect();
+      for (const item of order.lineItems) {
+        const variant = variants.find(v => v._id.toString() === item.variantId);
+        if (variant) {
+          await ctx.db.patch(variant._id, { stock: variant.stock + item.qty });
+        }
+      }
+    }
+
+    await ctx.db.delete(orderId);
   },
 });
