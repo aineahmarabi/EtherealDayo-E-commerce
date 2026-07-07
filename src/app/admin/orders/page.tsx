@@ -91,48 +91,50 @@ export default function OrdersPage() {
             {[0,1,2,3,4].map((i) => <Skeleton key={i} className="h-12 w-full" />)}
           </div>
         ) : (
-          <table className="w-full text-sm font-body">
-            <thead className="border-b border-gold/10 bg-bordeaux-deep/10">
-              <tr>
-                {["Order #", "Date", "Customer", "Items", "Total", "Channel", "Status", ""].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-muted-text whitespace-nowrap">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gold/5">
-              {filtered.length === 0 ? (
-                <tr><td colSpan={8} className="px-4 py-12 text-center text-muted-text">No orders found</td></tr>
-              ) : filtered.map((order) => (
-                <tr
-                  key={order._id}
-                  className={`hover:bg-bordeaux-deep/10 transition-colors cursor-pointer ${selected === order._id ? "bg-purple-900/10" : ""}`}
-                  onClick={() => setSelected(order._id === selected ? null : order._id)}
-                >
-                  <td className="px-4 py-3 text-gold font-mono text-xs">{order.number}</td>
-                  <td className="px-4 py-3 text-bone/60 text-xs whitespace-nowrap">{formatDate(order._creationTime)}</td>
-                  <td className="px-4 py-3">
-                    <p className="text-bone truncate max-w-[140px]">{order.customerName}</p>
-                    <p className="text-muted-text text-xs truncate max-w-[140px]">{order.customerEmail}</p>
-                  </td>
-                  <td className="px-4 py-3 text-bone/70">{order.lineItems.length}</td>
-                  <td className="px-4 py-3 text-bone font-medium">{formatPrice(order.total)}</td>
-                  <td className="px-4 py-3">
-                    <span className={`text-[9px] tracking-wider uppercase px-2 py-0.5 rounded-full ${order.channel === "manual" ? "bg-violet-900/30 text-violet-400" : "bg-bordeaux-deep/30 text-muted-text"}`}>
-                      {order.channel}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wide ${statusColor(order.status)}`}>
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <ChevronRight size={14} className={`transition-transform text-muted-text ${selected === order._id ? "rotate-90 text-gold" : ""}`} />
-                  </td>
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-sm font-body">
+              <thead className="border-b border-gold/10 bg-bordeaux-deep/10">
+                <tr>
+                  {["Order #", "Date", "Customer", "Items", "Total", "Channel", "Status", ""].map((h) => (
+                    <th key={h} className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-muted-text whitespace-nowrap">{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gold/5">
+                {filtered.length === 0 ? (
+                  <tr><td colSpan={8} className="px-4 py-12 text-center text-muted-text">No orders found</td></tr>
+                ) : filtered.map((order) => (
+                  <tr
+                    key={order._id}
+                    className={`hover:bg-bordeaux-deep/10 transition-colors cursor-pointer ${selected === order._id ? "bg-purple-900/10" : ""}`}
+                    onClick={() => setSelected(order._id === selected ? null : order._id)}
+                  >
+                    <td className="px-4 py-3 text-gold font-mono text-xs">{order.number}</td>
+                    <td className="px-4 py-3 text-bone/60 text-xs whitespace-nowrap">{formatDate(order._creationTime)}</td>
+                    <td className="px-4 py-3">
+                      <p className="text-bone truncate max-w-[140px]">{order.customerName}</p>
+                      <p className="text-muted-text text-xs truncate max-w-[140px]">{order.customerEmail}</p>
+                    </td>
+                    <td className="px-4 py-3 text-bone/70">{order.lineItems.length}</td>
+                    <td className="px-4 py-3 text-bone font-medium">{formatPrice(order.total)}</td>
+                    <td className="px-4 py-3">
+                      <span className={`text-[9px] tracking-wider uppercase px-2 py-0.5 rounded-full ${order.channel === "manual" ? "bg-violet-900/30 text-violet-400" : "bg-bordeaux-deep/30 text-muted-text"}`}>
+                        {order.channel}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wide ${statusColor(order.status)}`}>
+                        {order.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <ChevronRight size={14} className={`transition-transform text-muted-text ${selected === order._id ? "rotate-90 text-gold" : ""}`} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 

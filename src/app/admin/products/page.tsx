@@ -9,6 +9,15 @@ import { api } from "../../../../convex/_generated/api";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Plus, Search, Eye, EyeOff, Star } from "lucide-react";
 
+function formatKES(amount: number): string {
+  return new Intl.NumberFormat("en-KE", {
+    style: "currency",
+    currency: "KES",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
 function ProductGridImage({ src, alt }: { src: string; alt: string }) {
   const [error, setError] = useState(false);
 
@@ -46,7 +55,7 @@ export default function ProductsPage() {
   ) ?? [];
 
   return (
-    <div className="flex flex-col gap-6 max-w-7xl">
+    <div className="flex flex-col gap-6 max-w-7xl w-full overflow-x-hidden">
       <div className="flex items-center justify-between">
         <h1 className="font-display text-2xl text-bone">Products</h1>
         <button 
@@ -110,9 +119,12 @@ export default function ProductsPage() {
 
               {/* Info */}
               <div className="flex flex-col gap-0.5 flex-1">
-                <p className="text-[10px] text-muted-text font-body">{product.brandName}</p>
-                <p className="text-xs font-display text-bone leading-snug">{product.name}</p>
-                <p className="text-[10px] text-muted-text font-body">{product.family}</p>
+                <p className="text-xs text-muted-text font-body">{product.brandName}</p>
+                <p className="text-sm font-display text-bone leading-snug">{product.name}</p>
+                <p className="text-[11px] text-muted-text font-body">{product.family}</p>
+                {product.variants?.[0]?.price && (
+                  <p className="text-sm text-gold font-body mt-0.5">{formatKES(product.variants[0].price)}</p>
+                )}
               </div>
 
               {/* Actions */}

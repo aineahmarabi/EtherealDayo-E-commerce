@@ -336,25 +336,29 @@ export default function ProductEditPage({ params }: { params: Promise<{ id: stri
       </AnimatePresence>
 
       {/* Header */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <button onClick={() => router.push("/admin/products")} className="p-2 rounded-full border border-gold/20 text-muted-text hover:text-bone hover:border-gold/50 transition-colors">
-          <ArrowLeft size={15} />
-        </button>
-        <div className="flex-1 min-w-0">
-          <h1 className="font-display text-xl text-bone truncate">{form.name}</h1>
-          <div className="flex items-center gap-2 mt-0.5">
-            <span className={`text-[9px] uppercase tracking-widest px-2 py-0.5 rounded-full font-body ${form.status === "active" ? "bg-green-900/30 text-green-400" : "bg-gold/10 text-gold"}`}>
-              {form.status}
-            </span>
-            <span className="text-[10px] text-muted-text font-body">{product.brandName} · {product.slug}</span>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <button onClick={() => router.push("/admin/products")} className="p-2 rounded-full border border-gold/20 text-muted-text hover:text-bone hover:border-gold/50 transition-colors flex-shrink-0">
+            <ArrowLeft size={15} />
+          </button>
+          <div className="flex-1 min-w-0">
+            <h1 className="font-display text-xl text-bone truncate">{form.name}</h1>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className={`text-[9px] uppercase tracking-widest px-2 py-0.5 rounded-full font-body ${form.status === "active" ? "bg-green-900/30 text-green-400" : "bg-gold/10 text-gold"}`}>
+                {form.status}
+              </span>
+              <span className="text-[10px] text-muted-text font-body truncate">{product.brandName} · {product.slug}</span>
+            </div>
           </div>
         </div>
-        <button onClick={handleDelete} className="flex items-center gap-1.5 px-3 py-2 text-xs text-red-400 hover:text-red-300 border border-red-900/40 hover:border-red-700/50 rounded-full font-body transition-all">
-          <Trash2 size={12} /> Delete
-        </button>
-        <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-5 py-2.5 bg-gold text-noir rounded-full text-xs tracking-widest uppercase font-body hover:bg-gold-soft transition-colors disabled:opacity-60">
-          <Save size={13} />{saving ? "Saving..." : "Save Changes"}
-        </button>
+        <div className="flex items-center gap-2 sm:gap-3 pl-11 sm:pl-0">
+          <button onClick={handleDelete} className="flex items-center gap-1.5 px-3 py-2 text-xs text-red-400 hover:text-red-300 border border-red-900/40 hover:border-red-700/50 rounded-full font-body transition-all">
+            <Trash2 size={12} /> Delete
+          </button>
+          <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-5 py-2.5 bg-gold text-noir rounded-full text-xs tracking-widest uppercase font-body hover:bg-gold-soft transition-colors disabled:opacity-60 flex-1 sm:flex-initial justify-center">
+            <Save size={13} />{saving ? "Saving..." : "Save Changes"}
+          </button>
+        </div>
       </div>
 
       {/* Stats strip */}

@@ -40,28 +40,30 @@ export default function CustomersPage() {
         {customers === undefined ? (
           <div className="p-6 flex flex-col gap-3">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
         ) : (
-          <table className="w-full text-sm font-body">
-            <thead className="border-b border-gold/10 bg-bordeaux-deep/10">
-              <tr>
-                {["Name", "Email", "Phone", "Orders", "Total Spent"].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-muted-text whitespace-nowrap">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gold/5">
-              {filtered.length === 0 ? (
-                <tr><td colSpan={5} className="px-4 py-12 text-center text-muted-text">No customers found</td></tr>
-              ) : filtered.map((customer) => (
-                <tr key={customer._id} className="hover:bg-bordeaux-deep/10 transition-colors">
-                  <td className="px-4 py-3 text-bone">{customer.name}</td>
-                  <td className="px-4 py-3 text-muted-text text-xs">{customer.email}</td>
-                  <td className="px-4 py-3 text-bone/60 text-xs">{customer.phone ?? "—"}</td>
-                  <td className="px-4 py-3 text-bone/70">{customer.totalOrders}</td>
-                  <td className="px-4 py-3 text-bone">{formatPrice(customer.totalSpent)}</td>
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-sm font-body">
+              <thead className="border-b border-gold/10 bg-bordeaux-deep/10">
+                <tr>
+                  {["Name", "Email", "Phone", "Orders", "Total Spent"].map((h) => (
+                    <th key={h} className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-muted-text whitespace-nowrap">{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gold/5">
+                {filtered.length === 0 ? (
+                  <tr><td colSpan={5} className="px-4 py-12 text-center text-muted-text">No customers found</td></tr>
+                ) : filtered.map((customer) => (
+                  <tr key={customer._id} className="hover:bg-bordeaux-deep/10 transition-colors">
+                    <td className="px-4 py-3 text-bone">{customer.name}</td>
+                    <td className="px-4 py-3 text-muted-text text-xs">{customer.email}</td>
+                    <td className="px-4 py-3 text-bone/60 text-xs">{customer.phone ?? "—"}</td>
+                    <td className="px-4 py-3 text-bone/70">{customer.totalOrders}</td>
+                    <td className="px-4 py-3 text-bone">{formatPrice(customer.totalSpent)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

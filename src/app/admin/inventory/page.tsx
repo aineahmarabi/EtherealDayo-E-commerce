@@ -32,15 +32,16 @@ export default function InventoryPage() {
         {variants === undefined ? (
           <div className="p-6 flex flex-col gap-3">{[...Array(6)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
         ) : (
-          <table className="w-full text-sm font-body">
-            <thead className="border-b border-gold/10 bg-bordeaux-deep/10">
-              <tr>
-                {["Product", "Brand", "Size", "Conc.", "SKU", "Stock", "Adjust"].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-muted-text whitespace-nowrap">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gold/5">
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-sm font-body">
+              <thead className="border-b border-gold/10 bg-bordeaux-deep/10">
+                <tr>
+                  {["Product", "Brand", "Size", "Conc.", "SKU", "Stock", "Adjust"].map((h) => (
+                    <th key={h} className="px-4 py-3 text-left text-[10px] tracking-widest uppercase text-muted-text whitespace-nowrap">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gold/5">
               {variants.map((variant) => {
                 const product = productMap[variant.productId];
                 const isLow = variant.stock <= 5;
@@ -76,8 +77,9 @@ export default function InventoryPage() {
                   </tr>
                 );
               })}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>
