@@ -5,7 +5,7 @@ import { Id } from "./_generated/dataModel";
 const http = httpRouter();
 
 http.route({
-  pathPrefix: "/api/storage",
+  pathPrefix: "/api/storage/",
   method: "GET",
   handler: httpAction(async (ctx, request) => {
     const url = new URL(request.url);
