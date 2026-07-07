@@ -125,13 +125,15 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8 max-w-2xl">
+    <div className="flex flex-col gap-8 max-w-6xl w-full">
       <div className="flex items-center gap-2">
         <Settings size={14} className="text-muted-text" />
         <h1 className="font-display text-2xl text-bone">Settings</h1>
       </div>
 
-      {/* Store settings */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        <div className="flex flex-col gap-8">
+          {/* Store settings */}
       <form onSubmit={handleSaveAll} className="flex flex-col gap-5 p-6 rounded-2xl border border-gold/10 bg-bordeaux-deep/10">
         <h2 className="font-display text-sm text-bone tracking-wide">Store Configuration</h2>
         {settings === undefined ? (
@@ -162,8 +164,50 @@ export default function SettingsPage() {
           </>
         )}
       </form>
+          {/* Change PIN */}
+      <form onSubmit={handleChangePin} className="flex flex-col gap-5 p-6 rounded-2xl border border-gold/10 bg-bordeaux-deep/10">
+        <div className="flex items-center gap-2">
+          <Lock size={13} className="text-gold" />
+          <h2 className="font-display text-sm text-bone tracking-wide">Admin PIN</h2>
+        </div>
+        <p className="text-xs text-muted-text font-body -mt-2">
+          Change the PIN used to access this admin panel. Must be at least 4 digits.
+        </p>
 
-      {/* Shipping Zones */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[10px] tracking-widest uppercase text-muted-text font-body">Current PIN</label>
+          <PinInput value={currentPin} onChange={setCurrentPin} placeholder="••••" show={showCurrent} onToggle={() => setShowCurrent((v) => !v)} />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[10px] tracking-widest uppercase text-muted-text font-body">New PIN</label>
+          <PinInput value={newPin} onChange={setNewPin} placeholder="••••" show={showNew} onToggle={() => setShowNew((v) => !v)} />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[10px] tracking-widest uppercase text-muted-text font-body">Confirm New PIN</label>
+          <PinInput value={confirmPin} onChange={setConfirmPin} placeholder="••••" show={showConfirm} onToggle={() => setShowConfirm((v) => !v)} />
+        </div>
+
+        {pinStatus && (
+          <p className={`text-xs font-body ${pinStatus.type === "success" ? "text-green-400 flex items-center gap-1.5" : "text-dusty-rose"}`}>
+            {pinStatus.type === "success" && <ShieldCheck size={13} />}
+            {pinStatus.msg}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={pinLoading || !currentPin || !newPin || !confirmPin}
+          className="flex items-center gap-1.5 self-start px-5 py-2.5 bg-gold text-noir rounded-full text-xs tracking-widest uppercase font-body hover:bg-gold-soft transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          <Lock size={11} />
+          {pinLoading ? "Updating..." : "Update PIN"}
+        </button>
+      </form>
+        </div>
+        <div className="flex flex-col gap-8">
+          {/* Shipping Zones */}
       <div className="flex flex-col gap-4 p-6 rounded-2xl border border-gold/10 bg-bordeaux-deep/10">
         <div className="flex items-center gap-2">
           <Truck size={14} className="text-gold" />
@@ -226,48 +270,8 @@ export default function SettingsPage() {
           </div>
         )}
       </div>
-
-      {/* Change PIN */}
-      <form onSubmit={handleChangePin} className="flex flex-col gap-5 p-6 rounded-2xl border border-gold/10 bg-bordeaux-deep/10">
-        <div className="flex items-center gap-2">
-          <Lock size={13} className="text-gold" />
-          <h2 className="font-display text-sm text-bone tracking-wide">Admin PIN</h2>
         </div>
-        <p className="text-xs text-muted-text font-body -mt-2">
-          Change the PIN used to access this admin panel. Must be at least 4 digits.
-        </p>
-
-        <div className="flex flex-col gap-1.5">
-          <label className="text-[10px] tracking-widest uppercase text-muted-text font-body">Current PIN</label>
-          <PinInput value={currentPin} onChange={setCurrentPin} placeholder="••••" show={showCurrent} onToggle={() => setShowCurrent((v) => !v)} />
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <label className="text-[10px] tracking-widest uppercase text-muted-text font-body">New PIN</label>
-          <PinInput value={newPin} onChange={setNewPin} placeholder="••••" show={showNew} onToggle={() => setShowNew((v) => !v)} />
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <label className="text-[10px] tracking-widest uppercase text-muted-text font-body">Confirm New PIN</label>
-          <PinInput value={confirmPin} onChange={setConfirmPin} placeholder="••••" show={showConfirm} onToggle={() => setShowConfirm((v) => !v)} />
-        </div>
-
-        {pinStatus && (
-          <p className={`text-xs font-body ${pinStatus.type === "success" ? "text-green-400 flex items-center gap-1.5" : "text-dusty-rose"}`}>
-            {pinStatus.type === "success" && <ShieldCheck size={13} />}
-            {pinStatus.msg}
-          </p>
-        )}
-
-        <button
-          type="submit"
-          disabled={pinLoading || !currentPin || !newPin || !confirmPin}
-          className="flex items-center gap-1.5 self-start px-5 py-2.5 bg-gold text-noir rounded-full text-xs tracking-widest uppercase font-body hover:bg-gold-soft transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          <Lock size={11} />
-          {pinLoading ? "Updating..." : "Update PIN"}
-        </button>
-      </form>
-    </div>
+      </div>
+</div>
   );
 }

@@ -386,6 +386,11 @@ export default function CheckoutPage() {
           </div>
         </aside>
       </div>
+
+      {/* Minimal Checkout Footer */}
+      <footer className="mt-20 border-t border-gold/10 pt-8 pb-12 flex justify-center text-[10px] uppercase tracking-widest text-muted-text font-body">
+        <p>© {new Date().getFullYear()} Ethereal Dayo. All rights reserved.</p>
+      </footer>
     </div>
   );
 }
