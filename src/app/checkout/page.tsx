@@ -106,6 +106,7 @@ export default function CheckoutPage() {
   const [contact, setContact] = useState({ name: "", email: "", phone: "" });
   const [address, setAddress] = useState({ line1: "", line2: "", city: "", state: "", zip: "", country: "Kenya" });
   const [selectedShippingId, setSelectedShippingId] = useState("pickup");
+  const [paymentMethod, setPaymentMethod] = useState("cod");
   const [gift, setGift] = useState({ enabled: false, message: "" });
   
   const [billingOption, setBillingOption] = useState("same");
@@ -178,11 +179,16 @@ export default function CheckoutPage() {
         })),
         subtotal,
         shipping: shippingCost,
+        shippingMethod: selectedRate.name,
+        paymentMethod,
         tax: 0,
         total: orderTotal,
         giftMessage: gift.enabled ? gift.message : undefined,
       });
       clearCart();
+      if (typeof window !== "undefined") {
+        localStorage.setItem("ethereal_latest_order", number);
+      }
       router.push(`/order/${number}`);
     } catch (err) {
       console.error("Order failed:", err);
@@ -261,14 +267,14 @@ export default function CheckoutPage() {
             <p className="text-xs text-muted-text font-body">All transactions are secure and encrypted.</p>
             <div className="flex flex-col gap-0 border border-gold/15 rounded-xl bg-bordeaux-deep/10 overflow-hidden">
               <label className="flex items-center gap-4 cursor-pointer p-4 border-b border-gold/10">
-                <input type="radio" name="payment" value="cod" defaultChecked className="accent-gold w-4 h-4" />
+                <input type="radio" name="payment" value="cod" checked={paymentMethod === "cod"} onChange={() => setPaymentMethod("cod")} className="accent-gold w-4 h-4" />
                 <div className="flex flex-col">
                   <p className="text-sm font-body text-bone">Cash on Delivery</p>
                   <p className="text-xs text-muted-text font-body mt-0.5">Pay when your order arrives</p>
                 </div>
               </label>
               <label className="flex items-start gap-4 cursor-pointer p-4">
-                <input type="radio" name="payment" value="card" className="accent-gold w-4 h-4 mt-0.5" />
+                <input type="radio" name="payment" value="card" checked={paymentMethod === "card"} onChange={() => setPaymentMethod("card")} className="accent-gold w-4 h-4 mt-0.5" />
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-center w-full flex-wrap gap-2">
                     <p className="text-sm font-body text-bone">Card / Mobile Money</p>

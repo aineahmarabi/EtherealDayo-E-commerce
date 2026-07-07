@@ -106,11 +106,20 @@ export default function OrderConfirmationPage({ params }: { params: Promise<{ nu
             </div>
           </div>
 
-          <p className="text-sm text-muted-text font-body max-w-sm">
-            A confirmation has been sent to{" "}
-            <span className="text-bone">{order.customerEmail}</span>. You will receive a shipping
-            notification once your order has been dispatched.
-          </p>
+          <div className="flex flex-col gap-4 text-center max-w-sm mt-2">
+            {order.paymentMethod === "card" ? (
+              <p className="text-sm text-bone font-body p-4 border border-gold/30 rounded-xl bg-gold/5">
+                Your order is being taken care of. You will be communicated on means to pay.
+              </p>
+            ) : order.paymentMethod === "cod" ? (
+              <p className="text-sm text-bone font-body p-4 border border-gold/30 rounded-xl bg-gold/5">
+                Please prepare the exact amount in cash for delivery. You will receive a notification once dispatched.
+              </p>
+            ) : null}
+            <p className="text-xs text-muted-text font-body">
+              A confirmation has been sent to <span className="text-bone">{order.customerEmail}</span>.
+            </p>
+          </div>
 
           <Link
             href="/catalog"

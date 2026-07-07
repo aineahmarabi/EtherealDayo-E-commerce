@@ -82,12 +82,12 @@ export default function ContactPage() {
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="email" className="text-xs tracking-widest uppercase text-muted-text font-body">Email *</label>
+                  <label htmlFor="email" className="text-xs tracking-widest uppercase text-muted-text font-body">Email / Phone Number *</label>
                   <input
-                    id="email" type="email" required
+                    id="email" type="text" required
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    placeholder="your@email.com"
+                    placeholder="your@email.com or +254..."
                     className="w-full bg-bordeaux-deep/10 border border-gold/15 rounded-lg px-4 py-3 text-sm text-bone font-body placeholder:text-muted-text focus:border-gold/40 focus:outline-none transition-colors"
                   />
                 </div>

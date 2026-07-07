@@ -16,6 +16,7 @@ const NAV_LINKS = [
 
 const SUPPORT_LINKS = [
   { label: "Contact & Inquiry", href: "/contact" },
+  { label: "Track Order", href: "/track" },
   { label: "Shipping", href: "/shipping" },
   { label: "Returns", href: "/returns" },
 ];

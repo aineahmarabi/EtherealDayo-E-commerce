@@ -112,7 +112,31 @@ export const create = mutation({
       });
     }
 
-    return orderId;
+    return finalNumber;
+  },
+});
+
+export const searchTracking = query({
+  args: { query: v.string() },
+  handler: async (ctx, { query }) => {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+
+    const allOrders = await ctx.db.query("orders").collect();
+    
+    // Check if it perfectly matches an order number (case insensitive)
+    const exactNumber = allOrders.filter(o => o.number.toLowerCase() === q);
+    if (exactNumber.length > 0) return exactNumber;
+
+    // Check email
+    const exactEmail = allOrders.filter(o => o.customerEmail.toLowerCase() === q);
+    if (exactEmail.length > 0) return exactEmail;
+
+    // Check phone
+    const exactPhone = allOrders.filter(o => o.customerPhone && o.customerPhone.replace(/\s+/g, '') === q.replace(/\s+/g, ''));
+    if (exactPhone.length > 0) return exactPhone;
+
+    return [];
   },
 });
 
