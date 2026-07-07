@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import Papa from "papaparse";
 import { api } from "../../../../convex/_generated/api";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { Plus, Search, Eye, EyeOff, Star } from "lucide-react";
+import { Plus, Search, Eye, EyeOff, Star, Download, Upload, CheckCircle2 } from "lucide-react";
 
 function formatKES(amount: number): string {
   return new Intl.NumberFormat("en-KE", {
@@ -47,6 +48,98 @@ export default function ProductsPage() {
   const [search, setSearch] = useState("");
   const products = useQuery(api.products.listAll);
   const updateProduct = useMutation(api.products.update);
+  const bulkImport = useMutation(api.products.bulkImport);
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [importing, setImporting] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleExport = () => {
+    if (!products) return;
+    const rows: any[] = [];
+    for (const p of products) {
+      if (!p.variants || p.variants.length === 0) {
+        rows.push({
+          name: p.name, slug: p.slug, brandName: p.brandName, audience: p.audience,
+          family: p.family, notesTop: p.notesTop.join(", "), notesHeart: p.notesHeart.join(", "),
+          notesBase: p.notesBase.join(", "), perfumer: p.perfumer, year: p.year,
+          sillage: p.sillage, longevity: p.longevity, intensity: p.intensity,
+          story: p.story, images: p.images.join(", "), status: p.status,
+          variantSize: "", variantConcentration: "", variantPrice: "", variantSku: "", variantStock: ""
+        });
+      } else {
+        for (const v of p.variants) {
+          rows.push({
+            name: p.name, slug: p.slug, brandName: p.brandName, audience: p.audience,
+            family: p.family, notesTop: p.notesTop.join(", "), notesHeart: p.notesHeart.join(", "),
+            notesBase: p.notesBase.join(", "), perfumer: p.perfumer, year: p.year,
+            sillage: p.sillage, longevity: p.longevity, intensity: p.intensity,
+            story: p.story, images: p.images.join(", "), status: p.status,
+            variantSize: v.size, variantConcentration: v.concentration, 
+            variantPrice: v.price, variantSku: v.sku, variantStock: v.stock
+          });
+        }
+      }
+    }
+    const csv = Papa.unparse(rows);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `products_export_${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImporting(true);
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async (results) => {
+        try {
+          const rows = results.data.map((r: any) => ({
+            name: r.name || "",
+            slug: r.slug || "",
+            brandName: r.brandName || "",
+            audience: ["her", "him", "unisex"].includes(r.audience) ? r.audience : "unisex",
+            family: r.family || "",
+            notesTop: r.notesTop || "",
+            notesHeart: r.notesHeart || "",
+            notesBase: r.notesBase || "",
+            perfumer: r.perfumer || "",
+            year: Number(r.year) || new Date().getFullYear(),
+            sillage: Number(r.sillage) || 50,
+            longevity: Number(r.longevity) || 50,
+            intensity: Number(r.intensity) || 50,
+            story: r.story || "",
+            images: r.images || "",
+            status: ["active", "draft"].includes(r.status) ? r.status : "draft",
+            variantSize: r.variantSize || "",
+            variantConcentration: r.variantConcentration || "EDP",
+            variantPrice: Number(r.variantPrice) || 0,
+            variantSku: r.variantSku || "",
+            variantStock: Number(r.variantStock) || 0,
+          }));
+          await bulkImport({ rows });
+          showToast(`Imported ${rows.length} rows successfully!`);
+        } catch (error) {
+          console.error(error);
+          showToast("Failed to import. Check console and CSV format.");
+        } finally {
+          setImporting(false);
+          if (fileInputRef.current) fileInputRef.current.value = "";
+        }
+      },
+    });
+  };
 
   const filtered = products?.filter(
     (p) =>
@@ -56,15 +149,43 @@ export default function ProductsPage() {
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl w-full overflow-x-hidden">
-      <div className="flex items-center justify-between">
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+            className="fixed top-6 right-6 z-50 px-5 py-3 bg-purple-700/90 backdrop-blur-sm text-white text-sm font-body rounded-xl shadow-xl border border-purple-500/50"
+          >
+            <CheckCircle2 size={14} className="inline mr-2" />{toast}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h1 className="font-display text-2xl text-bone">Products</h1>
-        <button 
-          onClick={() => router.push("/admin/products/new")}
-          className="flex items-center gap-2 px-4 py-2.5 bg-gold text-noir rounded-full text-xs tracking-widest uppercase font-body hover:bg-gold-soft transition-colors cursor-pointer"
-        >
-          <Plus size={13} />
-          Add Product
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <input type="file" accept=".csv" ref={fileInputRef} onChange={handleImport} className="hidden" />
+          <button 
+            onClick={() => fileInputRef.current?.click()}
+            disabled={importing}
+            className="flex items-center gap-1.5 px-3 py-2 text-xs text-muted-text border border-gold/20 hover:border-gold/40 hover:text-bone rounded-full font-body transition-colors disabled:opacity-50"
+          >
+            <Upload size={13} /> {importing ? "Importing..." : "Import CSV"}
+          </button>
+          <button 
+            onClick={handleExport}
+            disabled={!products}
+            className="flex items-center gap-1.5 px-3 py-2 text-xs text-muted-text border border-gold/20 hover:border-gold/40 hover:text-bone rounded-full font-body transition-colors disabled:opacity-50"
+          >
+            <Download size={13} /> Export CSV
+          </button>
+          <button 
+            onClick={() => router.push("/admin/products/new")}
+            className="flex items-center gap-2 px-4 py-2.5 bg-gold text-noir rounded-full text-xs tracking-widest uppercase font-body hover:bg-gold-soft transition-colors cursor-pointer"
+          >
+            <Plus size={13} />
+            Add Product
+          </button>
+        </div>
       </div>
 
       {/* Search */}

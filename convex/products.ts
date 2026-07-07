@@ -221,3 +221,116 @@ export const update = mutation({
     await ctx.db.patch(id, patch);
   },
 });
+
+export const bulkImport = mutation({
+  args: {
+    rows: v.array(
+      v.object({
+        name: v.string(),
+        slug: v.string(),
+        brandName: v.string(),
+        audience: v.union(v.literal("her"), v.literal("him"), v.literal("unisex")),
+        family: v.string(),
+        notesTop: v.string(),
+        notesHeart: v.string(),
+        notesBase: v.string(),
+        perfumer: v.string(),
+        year: v.number(),
+        sillage: v.number(),
+        longevity: v.number(),
+        intensity: v.number(),
+        story: v.string(),
+        images: v.string(), // comma separated
+        status: v.union(v.literal("active"), v.literal("draft")),
+        variantSize: v.string(),
+        variantConcentration: v.string(),
+        variantPrice: v.number(),
+        variantSku: v.string(),
+        variantStock: v.number(),
+      })
+    ),
+  },
+  handler: async (ctx, { rows }) => {
+    const brands = await ctx.db.query("brands").collect();
+    
+    for (const row of rows) {
+      // Find or create brand (basic match by name)
+      let brand = brands.find(b => b.name.toLowerCase() === row.brandName.toLowerCase());
+      if (!brand) {
+        const brandId = await ctx.db.insert("brands", {
+          name: row.brandName,
+          slug: row.brandName.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+          description: "",
+          order: 0,
+        });
+        brand = await ctx.db.get(brandId);
+        if (brand) brands.push(brand);
+      }
+      
+      const brandId = brand!._id;
+
+      // Find product by slug
+      const existingProduct = await ctx.db
+        .query("products")
+        .withIndex("by_slug", (q) => q.eq("slug", row.slug))
+        .first();
+
+      const productData = {
+        name: row.name,
+        slug: row.slug,
+        brandId,
+        brandName: brand!.name,
+        audience: row.audience,
+        family: row.family,
+        notesTop: row.notesTop.split(",").map(s => s.trim()).filter(Boolean),
+        notesHeart: row.notesHeart.split(",").map(s => s.trim()).filter(Boolean),
+        notesBase: row.notesBase.split(",").map(s => s.trim()).filter(Boolean),
+        perfumer: row.perfumer,
+        year: row.year,
+        sillage: row.sillage,
+        longevity: row.longevity,
+        intensity: row.intensity,
+        story: row.story,
+        images: row.images.split(",").map(s => s.trim()).filter(Boolean),
+        isBestseller: false,
+        publishedAt: Date.now(),
+        status: row.status,
+      };
+
+      let productId;
+      if (existingProduct) {
+        await ctx.db.patch(existingProduct._id, productData);
+        productId = existingProduct._id;
+      } else {
+        productId = await ctx.db.insert("products", productData);
+      }
+
+      // Handle variant
+      if (row.variantSku) {
+        const existingVariants = await ctx.db
+          .query("variants")
+          .withIndex("by_product", (q) => q.eq("productId", productId))
+          .collect();
+        
+        const existingVariant = existingVariants.find(v => v.sku === row.variantSku);
+        const validConcentrations = ["EDP", "Parfum", "Extrait", "EDT"];
+        const conc = validConcentrations.includes(row.variantConcentration) ? row.variantConcentration as "EDP" | "Parfum" | "Extrait" | "EDT" : "EDP";
+
+        const variantData = {
+          productId,
+          size: row.variantSize,
+          concentration: conc,
+          price: row.variantPrice,
+          sku: row.variantSku,
+          stock: row.variantStock,
+        };
+
+        if (existingVariant) {
+          await ctx.db.patch(existingVariant._id, variantData);
+        } else {
+          await ctx.db.insert("variants", variantData);
+        }
+      }
+    }
+  },
+});

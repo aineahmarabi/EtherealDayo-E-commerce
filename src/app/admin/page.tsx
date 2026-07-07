@@ -45,10 +45,10 @@ function getRange(range: DateRange): { from: number; to: number } {
 }
 
 function StatItem({
-  label, value, loading, accent = "gold", data = []
+  label, value, loading, accent = "gold", data = [], className = ""
 }: {
   label: string; value?: string | number; loading?: boolean;
-  accent?: string; data?: number[]
+  accent?: string; data?: number[]; className?: string;
 }) {
   const max = Math.max(...data, 1);
   const min = Math.min(...data, 0);
@@ -62,7 +62,7 @@ function StatItem({
   const strokeClass = accent === "gold" ? "stroke-gold" : "stroke-dusty-rose";
 
   return (
-    <div className="flex flex-col gap-2 flex-1 px-4 py-2 border-r border-gold/10 last:border-r-0">
+    <div className={`flex flex-col gap-2 flex-1 ${className}`}>
       <div className="inline-block border-b border-dashed border-gold/30 pb-0.5 max-w-max">
         <span className="text-[13px] font-medium text-bone font-body">{label}</span>
       </div>
@@ -166,34 +166,36 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats Inline Container */}
-      <div className="flex bg-white/[0.02] border border-gold/10 rounded-xl shadow-sm p-3 w-full overflow-x-auto">
-        <div className="flex min-w-[700px] w-full">
-          <StatItem
-            label="Revenue"
-            value={metrics ? formatKES(metrics.revenue) : undefined}
-            loading={metrics === undefined}
-            data={metrics?.chartData?.revenue ?? []}
-          />
-          <StatItem
-            label="Total Sales"
-            value={metrics ? metrics.totalItems : undefined}
-            loading={metrics === undefined}
-            data={metrics?.chartData?.totalItems ?? []}
-          />
-          <StatItem
-            label="Orders"
-            value={metrics?.count}
-            loading={metrics === undefined}
-            data={metrics?.chartData?.count ?? []}
-          />
-          <StatItem
-            label="Low Stock"
-            value={allVariants === undefined ? undefined : lowStock.length}
-            loading={allVariants === undefined}
-            accent="dusty-rose"
-            data={[]}
-          />
-        </div>
+      <div className="grid grid-cols-2 lg:flex lg:flex-row bg-white/[0.02] border border-gold/10 rounded-xl shadow-sm overflow-hidden">
+        <StatItem
+          label="Revenue"
+          value={metrics ? formatKES(metrics.revenue) : undefined}
+          loading={metrics === undefined}
+          data={metrics?.chartData?.revenue ?? []}
+          className="border-b lg:border-b-0 border-r border-gold/10 p-3 sm:p-4"
+        />
+        <StatItem
+          label="Total Sales"
+          value={metrics ? metrics.totalItems : undefined}
+          loading={metrics === undefined}
+          data={metrics?.chartData?.totalItems ?? []}
+          className="border-b lg:border-b-0 lg:border-r border-gold/10 p-3 sm:p-4"
+        />
+        <StatItem
+          label="Orders"
+          value={metrics?.count}
+          loading={metrics === undefined}
+          data={metrics?.chartData?.count ?? []}
+          className="border-r border-gold/10 p-3 sm:p-4"
+        />
+        <StatItem
+          label="Low Stock"
+          value={allVariants === undefined ? undefined : lowStock.length}
+          loading={allVariants === undefined}
+          accent="dusty-rose"
+          data={[]}
+          className="p-3 sm:p-4"
+        />
       </div>
 
       {/* Recent orders + inquiries */}
