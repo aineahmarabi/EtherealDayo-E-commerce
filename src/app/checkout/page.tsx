@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { useCartStore } from "@/store/cartStore";
 import { useMutation, useQuery } from "convex/react";
@@ -292,11 +293,21 @@ export default function CheckoutPage() {
           <ul className="flex flex-col gap-4">
             {items.map((item) => (
               <li key={item.variantId} className="flex items-center gap-3">
-                <div className="w-12 h-14 rounded-lg bg-bordeaux-deep/40 flex items-center justify-center flex-shrink-0">
-                  <svg viewBox="0 0 30 42" className="w-7 h-10" aria-hidden="true">
-                    <rect x="10" y="1" width="10" height="7" rx="2" fill="#C9A961" opacity="0.5" />
-                    <path d="M5 8 Q3 14 3 22 L3 38 Q3 42 15 42 Q27 42 27 38 L27 22 Q27 14 25 8 Z" fill="#2A0A12" stroke="#C9A961" strokeWidth="0.6" strokeOpacity="0.35" />
-                  </svg>
+                <div className="w-12 h-14 rounded-lg bg-bordeaux-deep/40 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
+                  {item.image ? (
+                    <Image 
+                      src={item.image} 
+                      alt={item.productName}
+                      fill
+                      className="object-cover"
+                      sizes="48px"
+                    />
+                  ) : (
+                    <svg viewBox="0 0 30 42" className="w-7 h-10" aria-hidden="true">
+                      <rect x="10" y="1" width="10" height="7" rx="2" fill="#C9A961" opacity="0.5" />
+                      <path d="M5 8 Q3 14 3 22 L3 38 Q3 42 15 42 Q27 42 27 38 L27 22 Q27 14 25 8 Z" fill="#2A0A12" stroke="#C9A961" strokeWidth="0.6" strokeOpacity="0.35" />
+                    </svg>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-muted-text font-body">{item.brandName}</p>
