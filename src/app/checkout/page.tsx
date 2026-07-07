@@ -201,7 +201,7 @@ export default function CheckoutPage() {
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 flex flex-col-reverse lg:grid lg:grid-cols-[1fr_380px] gap-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 flex flex-col lg:grid lg:grid-cols-[1fr_380px] gap-12">
         <form onSubmit={placeOrder} className="flex flex-col gap-10">
           <section className="flex flex-col gap-4">
             <h2 className="font-display text-xl text-bone">Contact</h2>

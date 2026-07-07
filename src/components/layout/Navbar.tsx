@@ -21,7 +21,13 @@ export function Navbar() {
 
   const { itemCount, openCart } = useCartStore();
   const { openSearch } = useSearchStore();
-  const count = itemCount();
+  
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const count = mounted ? itemCount() : 0;
 
   const brands = useQuery(api.brands.list);
 
@@ -56,7 +62,7 @@ export function Navbar() {
     dropTimer.current = setTimeout(() => setBrandDropOpen(false), 200);
   };
 
-  if (pathname.startsWith("/admin")) {
+  if (pathname.startsWith("/admin") || pathname === "/checkout") {
     return null;
   }
 
