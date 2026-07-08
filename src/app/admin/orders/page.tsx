@@ -7,7 +7,10 @@ import Papa from "papaparse";
 import { api } from "../../../../convex/_generated/api";
 import { formatPrice, formatDate } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { Search, Plus, X, User, MapPin, Package, ChevronRight, CheckCircle2, Download, Upload, Trash2, AlertCircle } from "lucide-react";
+import {
+  Search, Upload, Download, Plus, ChevronRight, X, CheckCircle2,
+  Package, MapPin, User, Trash2, CreditCard
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type Status = "all" | "new" | "dispatched" | "fulfilled" | "refunded" | "cancelled";
@@ -340,6 +343,15 @@ export default function OrdersPage() {
                   <div className="flex justify-between text-bone font-medium text-sm pt-1 border-t border-purple-700/20 mt-1">
                     <span className="font-display">Total</span><span className="text-gold">{formatPrice(selectedOrder.total)}</span>
                   </div>
+                </div>
+                <div className="pt-3 border-t border-purple-700/20 flex flex-col gap-1 text-xs font-body mt-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <CreditCard size={13} className="text-purple-400" />
+                    <span className="text-[10px] uppercase tracking-widest text-muted-text font-body">Payment</span>
+                  </div>
+                  <p className="text-bone uppercase tracking-widest text-[10px]">
+                    {selectedOrder.paymentMethod === 'cod' ? 'Cash on Delivery' : selectedOrder.paymentMethod === 'card' ? 'Card / Mobile Money' : 'Not specified'}
+                  </p>
                 </div>
               </div>
 
