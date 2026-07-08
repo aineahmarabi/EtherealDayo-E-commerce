@@ -1,16 +1,24 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import { useQuery } from "convex/react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { api } from "../../../../convex/_generated/api";
 import { formatPrice } from "@/lib/utils";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Copy } from "lucide-react";
 
 export default function OrderConfirmationPage({ params }: { params: Promise<{ number: string }> }) {
   const { number } = use(params);
+  const [copied, setCopied] = useState(false);
   const order = useQuery(api.orders.getByNumber, { number });
+  const products = useQuery(api.products.listActive);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(number);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   if (order === undefined) {
     return (
@@ -38,15 +46,6 @@ export default function OrderConfirmationPage({ params }: { params: Promise<{ nu
 
   return (
     <div className="min-h-dvh bg-ink">
-      {/* Minimal nav */}
-      <header className="border-b border-gold/10 bg-noir/90 backdrop-blur-md">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-center">
-          <Link href="/" className="font-display text-base tracking-widest uppercase text-bone">
-            ⟡ Ethereal Dayo ⟡
-          </Link>
-        </div>
-      </header>
-
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -73,24 +72,48 @@ export default function OrderConfirmationPage({ params }: { params: Promise<{ nu
           </div>
 
           {/* Order number */}
-          <div className="px-8 py-4 border border-gold/20 rounded-2xl bg-bordeaux-deep/10">
+          <div 
+            onClick={handleCopy}
+            className="px-8 py-4 border border-gold/20 rounded-2xl bg-bordeaux-deep/10 cursor-pointer hover:bg-bordeaux-deep/20 transition-colors group relative"
+          >
             <p className="text-[10px] tracking-[0.35em] uppercase text-muted-text font-body">Order Number</p>
-            <p className="font-display text-xl text-gold mt-1">{order.number}</p>
+            <div className="flex items-center justify-center gap-3 mt-1">
+              <p className="font-display text-xl text-gold">{order.number}</p>
+              <Copy size={14} className="text-gold/50 group-hover:text-gold transition-colors" />
+            </div>
+            {copied && (
+              <motion.span 
+                initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}
+                className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] text-gold uppercase tracking-widest font-body"
+              >
+                Copied
+              </motion.span>
+            )}
           </div>
 
           {/* Items */}
           <div className="w-full">
             <div className="hairline mb-6" />
             <ul className="flex flex-col divide-y divide-gold/10">
-              {order.lineItems.map((item, i) => (
-                <li key={i} className="py-4 flex items-center justify-between gap-4 text-left">
-                  <div>
-                    <p className="text-sm font-display text-bone">{item.productName}</p>
-                    <p className="text-xs text-muted-text font-body">{item.size} · {item.concentration} · ×{item.qty}</p>
-                  </div>
-                  <span className="text-sm font-body text-bone flex-shrink-0">{formatPrice(item.price * item.qty)}</span>
-                </li>
-              ))}
+              {order.lineItems.map((item, i) => {
+                const product = products?.find(p => p.name === item.productName);
+                const imageUrl = product?.images?.[0] || "/placeholder.jpg";
+                
+                return (
+                  <li key={i} className="py-4 flex items-center justify-between gap-4 text-left">
+                    <div className="flex items-center gap-4">
+                      <div className="w-24 h-24 flex-shrink-0 bg-bordeaux-deep/10 border border-gold/10 rounded-xl overflow-hidden relative p-1">
+                        <img src={imageUrl} alt={item.productName} className="object-contain w-full h-full" />
+                      </div>
+                      <div>
+                        <p className="text-base font-display text-bone">{item.productName}</p>
+                        <p className="text-sm text-muted-text font-body mt-1">{item.size} · {item.concentration} · ×{item.qty}</p>
+                      </div>
+                    </div>
+                    <span className="text-base font-body text-bone flex-shrink-0">{formatPrice(item.price * item.qty)}</span>
+                  </li>
+                );
+              })}
             </ul>
             <div className="hairline mt-4 mb-4" />
             <div className="flex flex-col gap-1.5 text-sm font-body">

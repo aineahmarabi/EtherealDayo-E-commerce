@@ -273,7 +273,12 @@ export default function CheckoutPage() {
                   <p className="text-xs text-muted-text font-body mt-0.5">Pay when your order arrives</p>
                 </div>
               </label>
-              <label className="flex items-start gap-4 cursor-pointer p-4">
+              {paymentMethod === "cod" && (
+                <div className="bg-bordeaux-deep/30 p-4 border-b border-gold/10 text-xs text-muted-text font-body flex items-center text-center justify-center">
+                  <p>Please prepare the exact amount for the delivery rider. We will call you to confirm dispatch.</p>
+                </div>
+              )}
+              <label className={`flex items-start gap-4 cursor-pointer p-4 ${paymentMethod === "card" ? "border-b border-gold/10" : ""}`}>
                 <input type="radio" name="payment" value="card" checked={paymentMethod === "card"} onChange={() => setPaymentMethod("card")} className="accent-gold w-4 h-4 mt-0.5" />
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-center w-full flex-wrap gap-2">
@@ -288,6 +293,11 @@ export default function CheckoutPage() {
                   <p className="text-xs text-muted-text font-body mt-1">Pay securely online, instantly confirmed</p>
                 </div>
               </label>
+              {paymentMethod === "card" && (
+                <div className="bg-bordeaux-deep/30 p-4 text-xs text-muted-text font-body flex items-center text-center justify-center">
+                  <p>We are currently finalizing our automated payment gateway. Upon completing your order, our team will instantly contact you via WhatsApp or Email to process your payment securely.</p>
+                </div>
+              )}
             </div>
           </section>
 
@@ -319,9 +329,8 @@ export default function CheckoutPage() {
             </div>
           </section>
 
-          <button type="submit" disabled={placing}
-            className="w-full py-5 bg-gold text-noir rounded-xl text-sm tracking-widest uppercase font-body hover:bg-gold-soft transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer mt-2 shadow-lg shadow-gold/10">
-            {placing ? "Processing..." : `Place order — ${formatKES(orderTotal)}`}
+          <button type="submit" disabled={placing} className="w-full bg-gold hover:bg-gold-soft text-noir font-body uppercase tracking-widest text-xs py-4 rounded-xl transition-colors disabled:opacity-50 mt-4 flex items-center justify-center">
+            {placing ? <div className="w-4 h-4 border-2 border-noir/20 border-t-noir rounded-full animate-spin" /> : paymentMethod === "card" ? "Complete Order" : `Place Order — ${formatKES(orderTotal)}`}
           </button>
         </form>
 

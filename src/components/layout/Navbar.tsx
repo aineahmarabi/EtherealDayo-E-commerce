@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { ShoppingBag, Search, Menu, X } from "lucide-react";
+import { ShoppingBag, Search, Menu, X, Bike } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore, useSearchStore } from "@/store/cartStore";
 import { useQuery } from "convex/react";
@@ -99,7 +99,6 @@ export function Navbar() {
               <div className="flex items-center gap-6 pointer-events-auto">
                 <NavLink href="/for-her">For Her</NavLink>
                 <NavLink href="/catalog">Catalog</NavLink>
-                {hasOrder && <NavLink href="/track">Track Order</NavLink>}
 
                 {/* Shop by Brand dropdown */}
                 <div
@@ -175,6 +174,24 @@ export function Navbar() {
                 <NavLink href="/for-him">For Him</NavLink>
               </div>
             </div>
+
+            {/* Isolated Track Order Link */}
+            {hasOrder && (
+              <div className="absolute right-40 top-1/2 -translate-y-1/2 hidden lg:block">
+                <Link
+                  href="/track"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/40 bg-gold/5 text-[10px] text-gold uppercase tracking-widest font-body hover:bg-gold hover:text-noir transition-all duration-300 shadow-[0_0_15px_rgba(212,175,55,0.15)] group"
+                >
+                  <motion.div
+                    animate={{ x: [0, 4, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
+                  >
+                    <Bike size={14} className="text-gold group-hover:text-noir transition-colors" />
+                  </motion.div>
+                  Track Order
+                </Link>
+              </div>
+            )}
 
             {/* Icons — always at the far right edge */}
             <div className="ml-auto flex items-center gap-5">
@@ -294,10 +311,10 @@ export function Navbar() {
                 <MobileNavLink href="/" onClick={() => setMenuOpen(false)}>Home</MobileNavLink>
                 <MobileNavLink href="/for-her" onClick={() => setMenuOpen(false)}>For Her</MobileNavLink>
                 <MobileNavLink href="/for-him" onClick={() => setMenuOpen(false)}>For Him</MobileNavLink>
+                {hasOrder && <MobileNavLink href="/track" onClick={() => setMenuOpen(false)}>Track Order</MobileNavLink>}
                 <MobileNavLink href="/bestsellers" onClick={() => setMenuOpen(false)}>Bestsellers</MobileNavLink>
                 <MobileNavLink href="/new-arrivals" onClick={() => setMenuOpen(false)}>New Arrivals</MobileNavLink>
                 <MobileNavLink href="/catalog" onClick={() => setMenuOpen(false)}>Full Catalog</MobileNavLink>
-                {hasOrder && <MobileNavLink href="/track" onClick={() => setMenuOpen(false)}>Track Order</MobileNavLink>}
 
                 <div className="hairline my-5" />
 
