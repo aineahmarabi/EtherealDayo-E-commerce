@@ -162,7 +162,7 @@ export default function CheckoutPage() {
     setPlacing(true);
     try {
       const number = generateOrderNumber();
-      await createOrder({
+      const finalOrderNumber = await createOrder({
         number,
         channel: "web",
         customerName: contact.name,
@@ -186,10 +186,10 @@ export default function CheckoutPage() {
         giftMessage: gift.enabled ? gift.message : undefined,
       });
       clearCart();
-      if (typeof window !== "undefined") {
-        localStorage.setItem("ethereal_latest_order", number);
+      if (typeof window !== "undefined" && typeof finalOrderNumber === "string") {
+        localStorage.setItem("ethereal_latest_order", finalOrderNumber);
       }
-      router.push(`/order/${number}`);
+      router.push(`/order/${finalOrderNumber}`);
     } catch (err) {
       console.error("Order failed:", err);
       setPlacing(false);
