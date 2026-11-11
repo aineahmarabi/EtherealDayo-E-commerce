@@ -18,6 +18,7 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://etherealscents.vercel.app"),
   title: {
     default: "Ethereal Dayo — Maison de Parfum",
     template: "%s | Ethereal Dayo",
@@ -26,9 +27,16 @@ export const metadata: Metadata = {
     "Ultra-luxury niche fragrances from the world's most singular perfumers. Discover For Her, For Him, and beyond.",
   keywords: ["niche perfume", "luxury fragrance", "Ethereal Dayo", "oud", "rose", "leather"],
   openGraph: {
+    title: "Ethereal Dayo",
+    description: "Luxury niche fragrances, for her and for him.",
     siteName: "Ethereal Dayo",
     locale: "en_US",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ethereal Dayo",
+    description: "Luxury niche fragrances, for her and for him.",
   },
 };
 
