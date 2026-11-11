@@ -120,3 +120,14 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── Hero gallery marquee ─────────────────────────────────────────── */
+@keyframes marquee-up   { from { transform: translateY(0); }    to { transform: translateY(-50%); } }
+@keyframes marquee-down { from { transform: translateY(-50%); } to { transform: translateY(0); } }
+.marquee-up   { animation: marquee-up   linear infinite; }
+.marquee-down { animation: marquee-down linear infinite; }
+.marquee-pause:hover .marquee-up,
+.marquee-pause:hover .marquee-down { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .marquee-up, .marquee-down { animation: none; }
+}
