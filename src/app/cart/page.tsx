@@ -41,7 +41,7 @@ export default function CartPage() {
                 >
                   <div className="w-20 h-24 rounded-xl bg-bordeaux-deep/30 flex-shrink-0 flex items-center justify-center overflow-hidden">
                     {item.image ? (
-                      <Image src={item.image} alt={item.productName} width={80} height={96} className="object-cover w-full h-full" />
+                      <Image src={item.image} alt={item.productName} width={80} height={96} className="object-contain w-full h-full" />
                     ) : (
                       <svg viewBox="0 0 40 60" className="w-10 h-14" aria-hidden="true">
                         <rect x="14" y="2" width="12" height="8" rx="2" fill="#C9A961" opacity="0.6" />

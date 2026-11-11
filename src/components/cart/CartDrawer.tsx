@@ -100,7 +100,7 @@ export function CartDrawer() {
                             alt={item.productName}
                             width={64}
                             height={80}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain"
                           />
                         ) : (
                           <BottlePlaceholder accent="#C9A961" />

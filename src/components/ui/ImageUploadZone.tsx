@@ -134,7 +134,7 @@ export function ImageUploadZone({ images, onChange }: Props) {
                       <img
                         src={url}
                         alt=""
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                         onError={(e) => {
                           e.currentTarget.style.display = "none";
                           const fallback = e.currentTarget.parentElement?.querySelector(".fallback-placeholder") as HTMLElement | null;

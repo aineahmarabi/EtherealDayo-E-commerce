@@ -36,7 +36,7 @@ function ProductGridImage({ src, alt }: { src: string; alt: string }) {
       src={src}
       alt={alt}
       fill
-      className="object-cover"
+      className="object-contain p-4"
       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
       onError={() => setError(true)}
     />

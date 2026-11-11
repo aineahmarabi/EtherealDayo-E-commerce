@@ -152,7 +152,7 @@ function ProductPicker({ onAdd }: { onAdd: (item: Omit<LineItem, "qty">) => void
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-purple-900/20 transition-colors text-left border-b border-gold/5 last:border-0"
               >
                 {product.images && product.images.length > 0 ? (
-                  <Image src={product.images[0]} alt={product.name} width={32} height={32} className="w-8 h-8 object-cover rounded bg-white/5 flex-shrink-0" />
+                  <Image src={product.images[0]} alt={product.name} width={32} height={32} className="w-8 h-8 object-contain rounded bg-white/5 flex-shrink-0" />
                 ) : (
                   <div className="w-8 h-8 rounded bg-white/5 flex-shrink-0 flex items-center justify-center">
                     <Package size={14} className="text-muted-text" />

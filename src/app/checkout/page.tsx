@@ -346,7 +346,7 @@ export default function CheckoutPage() {
                       src={item.image} 
                       alt={item.productName}
                       fill
-                      className="object-cover"
+                      className="object-contain"
                       sizes="48px"
                     />
                   ) : (

@@ -167,7 +167,7 @@ export function SearchOverlay() {
                                   src={(product as any).images[0]} 
                                   alt={product.name}
                                   fill
-                                  className="object-cover"
+                                  className="object-contain"
                                   sizes="40px"
                                 />
                               ) : (

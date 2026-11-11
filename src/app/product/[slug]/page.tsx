@@ -197,7 +197,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 <div className="flex gap-2.5 justify-center">
                   {product.images.slice(0, 4).map((img: string, i: number) => (
                     <div key={i} className="w-14 h-14 rounded-lg overflow-hidden border border-gold/15 bg-bordeaux-deep/30 flex-shrink-0 cursor-pointer hover:border-gold/60 transition-colors">
-                      <Image src={img} alt={`${product.name} view ${i + 1}`} width={56} height={56} className="w-full h-full object-cover" />
+                      <Image src={img} alt={`${product.name} view ${i + 1}`} width={56} height={56} className="w-full h-full object-contain" />
                     </div>
                   ))}
                 </div>
